@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    LOTAR Core vocabulary for SRMD — Common part (shared by the P5xx domain parts; currently P520 —
+    P515's content was integrated into P520 on 2026-09-05, D-23).
+    See LOTAR_Core_Common_Vocabulary.md for the full attribute table and design notes.
+
+    Modeled on SRMDMICCore.xsd / SRMDSICCore.xsd: this file defines no new elements itself. It
+    xs:includes the base SRMD structural schema (SRMD.xsd, already in this project) and adds
+    Schematron rules that constrain the generic SRMD Classification/ClassificationEntry
+    key-value-pair model to the fixed keyword set proposed under
+    Classification[@type='org.lotar-international.lotar-core.common'].
+
+    Scope: only the administrative/legal cluster of GeneralPLMInfoType not already covered by
+    MIC Core (see MIC_Core_to_LOTAR_Mapping.md and P515_P520_vs_MIC_Core_Gap.md). Deliberately
+    excludes Traceability_Link_Type and anything built from it — inter-model/inter-artifact
+    linking is deferred to a future P550 standard. SIC Core was not consulted for this vocabulary
+    per direction.
+
+    This is a first-draft proposal: unlike SRMDMICCore.xsd / SRMDSICCore.xsd it does not yet
+    include Schematron Quick Fixes (sqf:) for auto-remediation — flagged here as follow-up work
+    once the vocabulary itself is reviewed and stable.
+
+    2026-07-20 update (confirmed, later same day): SIC Core is disregarded for the LOTAR Core
+    mandatory baseline for now — the administrative/legal ground this vocabulary and MIC Core
+    already cover is treated as sufficient; SRMDSICCore.xsd remains in WaitForLater/ and is not
+    part of the mandatory schema set. See LOTAR_Core_Common_Vocabulary.md.
+
+    2026-07-20 update: added administrative.generation-tool and
+    administrative.variable-naming-convention, both mandatory, migrated from FMI 3.0.2's root
+    provenance attributes (@generationTool, @variableNamingConvention) per the decision that the
+    FMI3 provenance layer now lives here instead of being checked against FMU files directly (see
+    FMISchematron/deprecated/lotar-fmi3.0.2-provenance.sch's own deprecation note). Export-control
+    fields (legal.export-controls / legal.export-control-marking / legal.special-markings) were
+    already mandatory here — confirmed by the same decision, not changed.
+
+    2026-07-20 (same day, follow-up): the FMI 2.0.5 provenance layer
+    (FMISchematron/deprecated/lotar-fmi2.0.5-provenance.sch) was deprecated the same way and
+    migrated here too — no new keywords needed, it reuses the same two new keywords above plus
+    five already-existing ones. FMI2's @numberOfEventIndicators (its one attribute with no FMI3
+    analog) was deliberately NOT
+    migrated — see LOTAR_Core_Common_Vocabulary.md for why.
+
+    2026-07-20 (later same day, item 4 of the profile-opportunity closure pass): added
+    administrative.disposal-reason, Mandatory but conditional on a Retracted STC life-cycle entry
+    existing anywhere in the SRMD instance — closes the PD12 (Disposal) profile opportunity
+    flagged in FMI_SSP_Evaluation_vs_Requirements_v3_LOTARCore.md §4. Added to the
+    allowed-keywords whitelist below and enforced via a new conditional sch:assert (pattern
+    "LOTAR Core Common: Conditional Mandatory Attributes"), mirroring the P515-ARCH pattern of
+    conditional "required if X exists" asserts already used in
+    FMISchematron/lotar-p515-archival.sch. See LOTAR_Core_Common_Vocabulary.md for the full
+    rationale.
+
+    2026-07-20 (later same day, PD4 Tier 1 closure): added administrative.size-bytes, unconditionally
+    Mandatory, recording the size in bytes of the whole Digital Object this SRMD instance describes
+    (the entire zipped FMU, or the entire zipped SSP, whichever container this SRMD is embedded in
+    or is sidecar to) — PD4's own text asks for "the size of the file recorded as an integer, in
+    bytes" for each Digital Object, and this is the archive-level ("Tier 1") half of a three-tier
+    proposal; Tier 2 (per-contained-artifact size inside an SSP) is enforced separately on
+    stc:Resource in lotar-stc-archival.sch, using the same keyword name for consistency. A Tier 3
+    (per-file-inside-an-FMU-zip manifest) was proposed but confirmed out of scope (2026-07-20) —
+    judged redundant/overkill given Tiers 1+2 already satisfy PD4's per-Digital-Object requirement.
+    administrative.size-bytes deliberately reuses P515_SCHEMA.xsd's existing @sizeBytes naming
+    convention (FMISchematron/lotar-p515-archival.sch, P515-ARCH-100c/101a) even though it is a
+    Classification keyword rather than a native XSD attribute (SRMD.xsd's root has no size/length
+    attribute and no xs:anyAttribute wildcard to extend via Schematron, the same constraint already
+    documented for administrative.disposal-reason and administrative.generation-tool above).
+
+    2026-07-21 (P6 closure): added administrative.submission-agreement-ref, unconditionally
+    Mandatory — closes P6 (Submission Agreement), whose text requires SIPs to "contain information
+    that reference the Submission Agreement between Producer and Archive," citing METS
+    metsHdr/altRecordID as the example mechanism. This keyword is the SRMD-Classification-level
+    equivalent of altRecordID: a repeatable-in-spirit (single-value-per-entry, as with every other
+    Common keyword) reference to the Submission Agreement of record, populated with an identifier
+    or a URI (via ClassificationEntry's optional xlink:href, same convention already used for
+    Copyright/License/Export_Controls). See METS's own definition of altRecordID for the pattern
+    this keyword mirrors:
+    https://mets.github.io/METS_Docs/mets_xsd_Complex_Type_metsType.html#metsType_metsHdr_altRecordID
+    ("The alternative record identifier element <altRecordID> allows one to use alternative record
+    identifier values for the digital object represented by the METS document; the primary record
+    identifier is stored in the OBJID attribute in the root <mets> element.") Made unconditionally
+    Mandatory (not conditional, unlike administrative.disposal-reason) because P6's own text is an
+    unconditional SHALL — every SIP is assumed to be covered by some Submission Agreement with the
+    Archive, per OAIS's own foundational producer-archive relationship.
+
+    2026-07-21 (provenance unification, later same day): per explicit direction to unify FMI2/FMI3/
+    SSP provenance into a single mechanism (this file + SRMDMICCore.xsd) rather than maintain
+    parallel, differently-tiered checks per format, and to make the basic "description" field
+    Mandatory in that unified mechanism:
+
+      - administrative.variable-naming-convention REMOVED (both from the Mandatory pattern below
+        and from the allowed-keywords whitelist). Confirmed by direction: this is a technical/
+        structural flag about FMI's own ModelVariables naming scheme (flat vs. structured), not
+        authorship/legal/provenance metadata — it does not belong in this vocabulary regardless of
+        format. Restored instead as a native rule directly in lotar-fmi2.0.5-archival.sch /
+        lotar-fmi3.0.2-archival.sch (see those files' own headers). administrative.generation-tool
+        is NOT affected by this — it stays here, since "what tool generated this" is genuinely
+        provenance, not a structural flag.
+      - administrative.created-by PROMOTED from the "Recommended (Optional) Attributes" pattern to
+        the "Mandatory Attributes" pattern below. This closes the gap flagged in
+        FMISchematron/FMI_vs_SSP_LOTAR_Rule_Comparison.md §1a: SRMD's own native @author attribute
+        had an independent [M] mandate (SRMD-ARCH-102 in lotar-srmd-archival.sch) while this
+        Classification-layer equivalent was only Recommended — two differently-tiered mechanisms
+        for the same fact. SRMD-ARCH-102 has been retired (see lotar-srmd-archival.sch's own
+        header) in favor of this single Classification-layer mandate, which now applies uniformly
+        to FMI2/FMI3/SSP-wrapped SRMD alike (this file has no format-specific logic at all).
+      - A new Mandatory check for MIC Core's purpose-objectives.model (the closest existing
+        keyword to a basic "description" field) was added below (see the new "LOTAR Core (Common)
+        override: MIC Core Mandatory Additions" pattern), per explicit direction to make the basic
+        description Mandatory. purpose-objectives.model is defined in the vendored, do-not-edit
+        SRMDMICCore.xsd, where it sits at Recommended tier only (role="info") — same "two
+        mechanisms, two tiers" problem as administrative.created-by above, but on a keyword LOTAR
+        doesn't own. Rather than edit the vendored external MIC Core schema (against this project's
+        established do-not-edit-vendored-files convention — see SRMD.xsd/P515_SCHEMA.xsd/the FMI
+        and SSP XSDs for the same precedent), this LOTAR-authored file adds its OWN stricter check
+        against the MIC-Core-scoped Classification block instead, the same "layer a stricter LOTAR
+        mandate on top of an unmodified vendored schema" pattern already used throughout this
+        project. This closes the other half of the SRMD-ARCH-101 retirement (see
+        lotar-srmd-archival.sch): purpose-objectives.model is the Classification-layer equivalent
+        of native @description, and is now Mandatory here too.
+      - administrative.version (already Mandatory, unchanged) is now documented as the shared,
+        unified home for THREE previously-separate content-versioning fields: SSP's
+        SystemStructureDescription/@fileversion (migrated 2026-07-21, see
+        FMISchematron/ssp2.0.1-rule-inventory.md §1), and — as of this same revision — FMI's own
+        fmiModelDescription/@version (FMI2 and FMI3 alike). The native FMI @version rule
+        (FMI2-ARCH-010i / FMI3-ARCH-010i, formerly [R] directly in each archival.sch) has been
+        retired the same way SRMD-ARCH-101/102 was — see both lotar-fmi2.0.5-archival.sch and
+        lotar-fmi3.0.2-archival.sch's own headers. One keyword, one tier, three formats.
+
+    BUG FOUND AND FIXED (2026-07-21, same revision): every sch:rule/@context attribute in this file
+    that referenced a sch:let-declared variable (e.g. context="...[@type=$lotar-core-common-type]")
+    failed to compile under lxml's isoschematron (libxslt): "xsltCompilePattern: failed to compile"
+    — confirmed via a minimal reproduction that sch:let variables work fine inside assert/report
+    test= expressions but are NOT supported inside a rule's context= match pattern by this
+    toolchain, regardless of whether the let is pattern-scoped or schema-scoped. This means this
+    file's embedded Schematron had never actually been compiled/validated before this revision (it
+    was authored and reasoned about, but never run). Fixed by inlining the literal
+    Classification/@type string directly into every context= attribute instead of referencing the
+    variable there; the one remaining $lotar-core-common-type reference (inside the "Classification
+    Presence" pattern's assert test=) is unaffected and left as-is, since variables in test=
+    expressions do work. The identical anti-pattern (variable used in context=) also exists in
+    SRMDLOTARCore_DublinCore.xsd, SRMDLOTARCore_P515.xsd, and SRMDLOTARCore_P520.xsd — NOT fixed
+    (2026-09-05 update: _P520.xsd IS now fixed and verified under lxml, D-23; _P515.xsd retired) —
+    here (out of scope for this revision, which only touches Common); flagged in
+    FMISchematron/FMI_vs_SSP_LOTAR_Rule_Comparison.md and the artifacts/decisions log as a
+    follow-up needed. SRMDMICCore.xsd has the same pattern too but is vendored/do-not-edit (see its
+    own header) — if it's genuinely broken the same way, that's an upstream MIC Core issue, not
+    something to patch here.
+
+    2026-08-04 (T-04, risk-profile plan execution): added risk.level and
+    administrative.archiving-required to the allowed-keywords whitelist, plus a new "Value
+    Validity" pattern checking both are one of their closed-enum values wherever they appear. Both
+    are new LOTAR-native keywords (no GeneralPLMInfoType analogue) whose PRIMARY, Mandatory
+    attachment point is not a generic SRMD root's Classification block at all - it is a specific
+    Output particle inside a DTMD.xsd instance (DefinitionPhase/DefineResultQuality/Output for
+    risk.level; FulfillmentPhase/DecideObjectiveFulfillment/Output for
+    administrative.archiving-required - see LOTAR_Risk_Assessment_Method.md Sec 4). This file's
+    own sch:rule contexts are hard-anchored to /srmd:SimulationResourceMetaData/... and cannot
+    fire on a DTMD-hosted instance, so NOT added to the "Mandatory Attributes" pattern below -
+    that would incorrectly require every generic SRMD to carry a risk level. Their real Mandatory
+    enforcement, scoped to the DTMD attachment point, is task T-09a (build
+    lotar-dtmd-archival.sch), which depends on DTMD.xsd being vendored first (T-08, still open).
+    Added here only so the keywords are recognized (whitelist) and self-consistent (enum check)
+    wherever they do appear, including an SRMD sidecar mirroring the DTMD's risk decision for
+    cross-reference convenience.
+
+    Net effect of this revision: "provenance" for FMI2, FMI3, and SSP now runs through exactly one
+    mechanism — this file plus SRMDMICCore.xsd's Classification keywords, validated against any
+    SRMD instance regardless of which format it's embedded in or sidecar to. No format-specific
+    provenance Schematron exists anywhere in this project any more (lotar-fmi2.0.5-provenance.sch /
+    lotar-fmi3.0.2-provenance.sch were already deprecated 2026-07-20; the newer SRMD-ARCH-101/102
+    native-attribute duplicate is retired as of this same revision). Real-world tool compliance
+    with provenance fields is thin regardless of format (see fmi2/fmi3 corpus reports — 49-94% of
+    real files miss at least one provenance field), which is exactly why a single shared mechanism
+    is preferable to maintaining several slightly-different ones: there's no format-specific reason
+    for the bar to differ.
+
+    2026-08-06 (Dublin Core absorption): the standalone SRMDLOTARCore_DublinCore.xsd (its own
+    Classification type, 'org.lotar-international.lotar-core.dublin-core') is retired and its 7
+    keywords — dc.contributor, dc.coverage, dc.language, dc.publisher, dc.relation, dc.source,
+    dc.subject — are folded into THIS file's Classification type
+    ('org.lotar-international.lotar-core.common') instead, at the same Recommended tier they
+    already had. No keyword-name collision existed with any pre-existing Common keyword (checked
+    against the allowed-keywords whitelist below before merging), so this is a pure consolidation,
+    not a reconciliation of conflicting definitions. Rationale: the Dublin Core mapping was never
+    architecturally independent — 8 of its 15 terms already reused Common/MIC-Core fields, and the
+    remaining 7 were always going to co-reside in the same SRMD document as this file's own
+    Classification block. Maintaining them as a second Classification type bought no isolation
+    benefit (both are LOTAR-authored, both are mandatory-baseline vocabulary) and cost a second
+    file, a second .sch to gate, and a second Classification-presence check that every consuming
+    instance would otherwise need to satisfy. The relationship to Dublin Core Metadata Element Set
+    1.1 is preserved as documentation only (see the "Dublin Core mapping (D2)" section of
+    LOTAR_Core_Common_Vocabulary.md for the full 15-term table and rationale) — it is no longer a
+    separate namespace/type in the schema itself. The old file is retained at
+    deprecated/SRMDLOTARCore_DublinCore.xsd for historical reference, per this project's
+    non-destructive convention; it is no longer part of the mandatory schema set and is not
+    referenced by any current documentation. dc.contributor, dc.relation, dc.source, and
+    dc.subject remain repeatable (ported verbatim from the old file's own repeatable-keywords
+    rule, now folded into this file's "Attribute Rules" pattern below) — every other keyword in
+    this file's whitelist remains single-valued-per-entry, as before.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+    xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" vc:minVersion="1.1"
+    xmlns:srmd="http://ssp-standard.org/SSPTraceability1/SimulationResourceMetaData"
+    xmlns:stc="http://ssp-standard.org/SSPTraceability1/SSPTraceabilityCommon"
+    xmlns:ssc="http://ssp-standard.org/SSP1/SystemStructureCommon"
+    xmlns:sch="http://purl.oclc.org/dsdl/schematron"
+    targetNamespace="http://ssp-standard.org/SSPTraceability1/SimulationResourceMetaData">
+
+    <xs:include schemaLocation="../schemas-vendored/SRMD.xsd"/>
+    <!-- D-24 (2026-09-05): risk.level, model-validation.mode, signature.method and
+         signature.validation-note are no longer LOTAR keywords. The credible-process layer owns them
+         under Classification[@type='org.credible-process.core'] (credibility.level CL1..CL4 replaces
+         risk.level R1..R4; credible-process-schemas/vocabulary/). LOTAR keeps
+         administrative.archiving-required here and cites the layer's level. -->
+
+    <xs:annotation>
+        <xs:appinfo>
+            <sch:title>LOTAR Core (Common) Classification Checks</sch:title>
+            <sch:ns uri="http://ssp-standard.org/SSPTraceability1/SimulationResourceMetaData" prefix="srmd"/>
+            <sch:ns uri="http://ssp-standard.org/SSPTraceability1/SSPTraceabilityCommon" prefix="stc"/>
+
+            <sch:pattern>
+                <sch:title>LOTAR Core Common: Classification Presence</sch:title>
+                <sch:let name="lotar-core-common-type" value="'org.lotar-international.lotar-core.common'"/>
+                <sch:rule context="/srmd:SimulationResourceMetaData" role="info">
+                    <sch:assert test="count(stc:Classification[@type=$lotar-core-common-type])&lt;=1">
+                        More than one LOTAR Core (Common) classification.
+                    </sch:assert>
+                </sch:rule>
+            </sch:pattern>
+
+            <sch:pattern>
+                <sch:title>LOTAR Core Common: Mandatory Attributes</sch:title>
+                <sch:rule context="/srmd:SimulationResourceMetaData/stc:Classification[@type='org.lotar-international.lotar-core.common']">
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.version']">Missing mandatory Version attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.created-on']">Missing mandatory Created On attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.usage']">Missing mandatory Usage attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.model-dependency']">Missing mandatory Model Dependency attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.model-hierarchy']">Missing mandatory Model Hierarchy attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.abstraction-level']">Missing mandatory Abstraction Level attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.privacy-rules']">Missing mandatory Privacy Rules attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.specification-type-objectives']">Missing mandatory Specification Type Objectives attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.generation-tool']">Missing mandatory Generation Tool attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.created-by']">Missing mandatory Created By attribute. Promoted from Recommended 2026-07-21 as part of the FMI2/FMI3/SSP provenance unification (see header REVISION note) — this is the Classification-layer equivalent of native @author, previously enforced independently and less strictly than SRMD-ARCH-102 (now retired in favor of this single mandate).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.size-bytes']">Missing mandatory Size (Bytes) attribute — required for every SRMD instance, recording the size in bytes of the whole Digital Object this instance describes (PD4).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.submission-agreement-ref']">Missing mandatory Submission Agreement Reference attribute (P6) — every SIP must reference the Submission Agreement between Producer and Archive.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='legal.copyright']">Missing mandatory Copyright attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='legal.license']">Missing mandatory License attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='legal.export-controls']">Missing mandatory Export Controls attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='legal.export-control-marking']">Missing mandatory Export Control Marking attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='legal.special-markings']">Missing mandatory Special Markings attribute.</sch:assert>
+                </sch:rule>
+            </sch:pattern>
+
+            <sch:pattern>
+                <sch:title>LOTAR Core (Common) override: MIC Core Mandatory Additions</sch:title>
+                <!--
+                    Added 2026-07-21 (provenance unification): purpose-objectives.model is MIC
+                    Core's closest equivalent to a basic "description" field (SRMDMICCore.xsd's own
+                    fix-message calls it "model purpose attribute"), and per explicit direction the
+                    basic description must be Mandatory in the unified provenance mechanism. MIC
+                    Core itself (SRMDMICCore.xsd, vendored from the external MIC-Core specification
+                    — see that file's own header) keeps it at Recommended tier (role="info"); this
+                    file does NOT edit that vendored schema (same do-not-edit-vendored convention as
+                    SRMD.xsd/P515_SCHEMA.xsd elsewhere in this project) but instead layers its own
+                    stricter check on top, targeting the MIC-Core-scoped Classification block
+                    directly. This is the Classification-layer counterpart to the retired
+                    SRMD-ARCH-101 native @description mandate (see lotar-srmd-archival.sch).
+                -->
+                <sch:rule context="/srmd:SimulationResourceMetaData/stc:Classification[@type='org.mic-core.mic-core']">
+                    <sch:assert test="stc:ClassificationEntry[@keyword='purpose-objectives.model']">
+                        Missing mandatory Purpose/Objectives (basic description) attribute
+                        (purpose-objectives.model) — Recommended-only in the base MIC Core schema,
+                        promoted to Mandatory here as the unified provenance layer's basic
+                        description field for FMI2, FMI3, and SSP alike.
+                    </sch:assert>
+                </sch:rule>
+            </sch:pattern>
+
+            <sch:pattern>
+                <sch:title>LOTAR Core Common: Conditional Mandatory Attributes</sch:title>
+                <!--
+                    Item 4 (2026-07-20): administrative.disposal-reason is Mandatory only when the
+                    SRMD instance carries a Retracted STC life-cycle entry (anywhere in the
+                    document — life-cycle information can occur at multiple phase/step levels, not
+                    only at the Classification's own enclosing element). Mirrors the P515-ARCH
+                    pattern of conditional "required if X exists" asserts in
+                    FMISchematron/lotar-p515-archival.sch. Closes PD12 (Disposal), whose own text
+                    requires "the name of the authorising agent and reasons for deletion" once a
+                    disposal/retraction event exists — the authorising-agent half is covered
+                    separately by lotar-stc-archival.sch's universal Signature mandate on the
+                    Retracted entry itself.
+                -->
+                <sch:rule context="/srmd:SimulationResourceMetaData/stc:Classification[@type='org.lotar-international.lotar-core.common']">
+                    <sch:assert test="not(//stc:Retracted) or stc:ClassificationEntry[@keyword='administrative.disposal-reason']">
+                        Missing mandatory Disposal Reason attribute (administrative.disposal-reason) — required because this SRMD instance carries at least one Retracted life-cycle entry.
+                    </sch:assert>
+                </sch:rule>
+            </sch:pattern>
+
+            <sch:pattern>
+                <sch:title>LOTAR Core Common: Recommended (Optional) Attributes</sch:title>
+                <sch:rule context="/srmd:SimulationResourceMetaData/stc:Classification[@type='org.lotar-international.lotar-core.common']" role="info">
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.last-modified-date']">Missing optional Last Modified Date attribute.</sch:assert>
+                    <!-- administrative.created-by MOVED to the Mandatory pattern above 2026-07-21 (provenance unification) -->
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.author-organization']">Missing optional Author Organization attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.approver']">Missing optional Approver attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.approval-state']">Missing optional Approval State attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.authorization']">Missing optional Authorization attribute.</sch:assert>
+                </sch:rule>
+            </sch:pattern>
+
+            <sch:pattern>
+                <sch:title>LOTAR Core Common: Dublin Core Recommended Attributes (absorbed 2026-08-06)</sch:title>
+                <!--
+                    Ported verbatim from the retired SRMDLOTARCore_DublinCore.xsd (see this file's
+                    header note). These are the 7 of Dublin Core Metadata Element Set 1.1's 15 terms
+                    that have no existing MIC Core / Common / structural counterpart (the other 8
+                    are documented as equivalent to already-existing fields — see
+                    LOTAR_Core_Common_Vocabulary.md's "Dublin Core mapping (D2)" section). Still
+                    Recommended, not Mandatory, for the same reason as before: these DC roles are
+                    not universally applicable to every archived simulation artifact.
+                -->
+                <sch:rule context="/srmd:SimulationResourceMetaData/stc:Classification[@type='org.lotar-international.lotar-core.common']" role="info">
+                    <sch:assert test="stc:ClassificationEntry[@keyword='dc.contributor']">Missing optional Contributor attribute (Dublin Core "contributor").</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='dc.coverage']">Missing optional Coverage attribute (Dublin Core "coverage" — spatial/temporal scope).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='dc.language']">Missing optional Language attribute (Dublin Core "language").</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='dc.publisher']">Missing optional Publisher attribute (Dublin Core "publisher" — the entity making the resource available, distinct from its creator).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='dc.relation']">Missing optional Relation attribute (Dublin Core "relation" — a related resource).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='dc.source']">Missing optional Source attribute (Dublin Core "source" — a related resource from which this one is derived).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='dc.subject']">Missing optional Subject attribute (Dublin Core "subject" — topic/keywords).</sch:assert>
+                </sch:rule>
+            </sch:pattern>
+
+            <sch:pattern>
+                <sch:title>LOTAR Core Common: administrative.archiving-required Value Validity</sch:title>
+                <!--
+                    Added 2026-08-04 (T-04). Both keywords are closed-enum: risk.level must be one
+                    of R1/R2/R3/R4 (D-7); administrative.archiving-required must be one of yes/no
+                    (D-17). This checks value self-consistency wherever the keyword appears; it
+                    does NOT check presence/mandatoriness, since that is DTMD-context-specific and
+                    belongs to lotar-dtmd-archival.sch (T-09a), not this SRMD-scoped file.
+                -->
+                <sch:rule context="/srmd:SimulationResourceMetaData/stc:Classification[@type='org.lotar-international.lotar-core.common']/stc:ClassificationEntry[@keyword='administrative.archiving-required']">
+                    <sch:assert test=". = 'yes' or . = 'no'">
+                        Invalid administrative.archiving-required value '<sch:value-of select="."/>' — must be 'yes' or 'no'.
+                    </sch:assert>
+                </sch:rule>
+            </sch:pattern>
+
+            <sch:pattern>
+                <sch:title>LOTAR Core Common: Attribute Rules</sch:title>
+                <!--
+                    BUG FOUND AND FIXED (2026-07-21): the original value used an XPath 2.0 sequence
+                    constructor "('a', 'b', 'c')" for @keyword = $allowed-keywords membership
+                    testing. This project's Schematron convention is queryBinding="xslt"
+                    (XPath 1.0/XSLT 1.0) throughout — XPath 1.0 has no sequence/tuple type, so this
+                    never compiled (confirmed: "Failed to compile the XPath expression" under
+                    lxml's isoschematron). Rewritten using the standard XPath 1.0
+                    delimited-string-membership idiom instead: a single '|'-delimited string, tested
+                    with contains(). Same effective semantics, actually XPath-1.0-valid.
+                -->
+                <sch:let name="allowed-keywords" value="'|administrative.version|administrative.created-on|administrative.last-modified-date|administrative.created-by|administrative.author-organization|administrative.approver|administrative.approval-state|administrative.authorization|administrative.usage|administrative.model-dependency|administrative.model-hierarchy|administrative.abstraction-level|administrative.privacy-rules|administrative.specification-type-objectives|administrative.generation-tool|administrative.disposal-reason|administrative.size-bytes|administrative.submission-agreement-ref|administrative.archiving-required|legal.copyright|legal.license|legal.export-controls|legal.export-control-marking|legal.special-markings|dc.contributor|dc.coverage|dc.language|dc.publisher|dc.relation|dc.source|dc.subject|'"/>
+
+                <sch:rule context="/srmd:SimulationResourceMetaData/stc:Classification[@type='org.lotar-international.lotar-core.common']/stc:ClassificationEntry">
+                    <sch:assert test="contains($allowed-keywords, concat('|', @keyword, '|'))">
+                        Unknown LOTAR Core (Common) classification attribute '<sch:value-of select="@keyword"/>'.
+                    </sch:assert>
+                </sch:rule>
+            </sch:pattern>
+
+            <sch:pattern>
+                <sch:title>LOTAR Core Common: Dublin Core Repeatable-Keyword Rule (absorbed 2026-08-06)</sch:title>
+                <!--
+                    Ported verbatim from the retired SRMDLOTARCore_DublinCore.xsd, and — like every
+                    other pattern in this file (see the BUG FOUND AND FIXED header note above) —
+                    written with the literal Classification/@type and @keyword strings inlined
+                    directly into the rule's context= attribute rather than via a sch:let variable,
+                    since this toolchain (lxml's isoschematron/libxslt) does not support sch:let
+                    variables inside a rule's context= match pattern. Every other keyword in this
+                    file's whitelist is single-valued-per-entry (unchanged); dc.coverage,
+                    dc.language, and dc.publisher are covered by the non-repeatable rule below;
+                    dc.contributor, dc.relation, dc.source, and dc.subject are deliberately exempt
+                    (carried over from Dublin Core's own repeatable elements — each can legitimately
+                    occur more than once on the same resource).
+                -->
+                <sch:rule context="/srmd:SimulationResourceMetaData/stc:Classification[@type='org.lotar-international.lotar-core.common']/stc:ClassificationEntry[@keyword='dc.coverage' or @keyword='dc.language' or @keyword='dc.publisher']">
+                    <sch:assert test="count(preceding-sibling::stc:ClassificationEntry[@keyword=current()/@keyword]) = 0">
+                        The attribute '<sch:value-of select="@keyword"/>' occurred more than once (this keyword is not defined as repeatable).
+                    </sch:assert>
+                </sch:rule>
+            </sch:pattern>
+        </xs:appinfo>
+    </xs:annotation>
+
+</xs:schema>

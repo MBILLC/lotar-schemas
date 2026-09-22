@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fmiModelDescription
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="fmi-standard-2.0.x/schema/fmi2ModelDescription.xsd"
+    fmiVersion="2.0"
+    modelName="Full.Test.Model"
+    guid="{11111111-1111-1111-1111-111111111111}"
+    description="A fully populated archival-conformant test model."
+    author="Hubertus Tummescheit"
+    version="1.0.0"
+    copyright="(c) 2026 MBI"
+    license="BSD-2-Clause"
+    generationTool="LOTAR-Archival-TestHarness"
+    generationDateAndTime="2026-07-18T12:00:00Z"
+    variableNamingConvention="flat"
+    numberOfEventIndicators="0">
+
+    <CoSimulation modelIdentifier="FullTestCS"
+        needsExecutionTool="false"
+        canHandleVariableCommunicationStepSize="false"
+        canInterpolateInputs="false"
+        maxOutputDerivativeOrder="0"
+        canRunAsynchronuously="false"
+        canBeInstantiatedOnlyOncePerProcess="false"
+        canNotUseMemoryManagementFunctions="false"
+        canGetAndSetFMUstate="false"
+        canSerializeFMUstate="false"
+        providesDirectionalDerivative="false">
+        <SourceFiles>
+            <File name="model.c"/>
+        </SourceFiles>
+    </CoSimulation>
+
+    <UnitDefinitions>
+        <Unit name="rad">
+            <BaseUnit rad="1" factor="1" offset="0"/>
+            <DisplayUnit name="deg" factor="57.29577951308232" offset="0"/>
+        </Unit>
+    </UnitDefinitions>
+
+    <TypeDefinitions>
+        <SimpleType name="Angle" description="An angle type">
+            <Real quantity="Angle" unit="rad" displayUnit="rad" relativeQuantity="false"
+                  min="-10" max="10" nominal="1" unbounded="false"/>
+        </SimpleType>
+        <SimpleType name="Count" description="A bounded counter type">
+            <Integer quantity="Count" min="0" max="100"/>
+        </SimpleType>
+        <SimpleType name="Mode" description="Operating mode enumeration">
+            <Enumeration quantity="Mode">
+                <Item name="Off" value="1" description="Model is off"/>
+                <Item name="On" value="2" description="Model is on"/>
+            </Enumeration>
+        </SimpleType>
+    </TypeDefinitions>
+
+    <LogCategories>
+        <Category name="logAll" description="Log everything"/>
+        <Category name="logStatusWarning" description="Log warnings only"/>
+    </LogCategories>
+
+    <DefaultExperiment startTime="0" stopTime="10" tolerance="1e-6" stepSize="0.01"/>
+
+    <VendorAnnotations>
+        <Tool name="TestTool"/>
+    </VendorAnnotations>
+
+    <ModelVariables>
+        <ScalarVariable name="x" valueReference="0" description="state x"
+            causality="output" variability="continuous" initial="calculated"
+            canHandleMultipleSetPerTimeInstant="true">
+            <Real declaredType="Angle" quantity="Angle" unit="rad" displayUnit="deg"
+                  relativeQuantity="false" min="-10" max="10" nominal="1" unbounded="false"
+                  start="0" derivative="2" reinit="false"/>
+            <Annotations>
+                <Tool name="TestTool"/>
+            </Annotations>
+        </ScalarVariable>
+        <ScalarVariable name="der_x" valueReference="1" description="derivative of x"
+            causality="local" variability="continuous" initial="calculated"
+            canHandleMultipleSetPerTimeInstant="true">
+            <Real declaredType="Angle" quantity="Angle" unit="rad" displayUnit="deg"
+                  relativeQuantity="false" min="-10" max="10" nominal="1" unbounded="false"
+                  start="0" derivative="1" reinit="false"/>
+            <Annotations>
+                <Tool name="TestTool"/>
+            </Annotations>
+        </ScalarVariable>
+        <ScalarVariable name="count_var" valueReference="2" description="bounded counter parameter"
+            causality="parameter" variability="fixed" initial="exact">
+            <Integer declaredType="Count" quantity="Count" min="0" max="10" start="5"/>
+            <Annotations>
+                <Tool name="TestTool"/>
+            </Annotations>
+        </ScalarVariable>
+        <ScalarVariable name="mode_var" valueReference="3" description="operating mode parameter"
+            causality="parameter" variability="fixed" initial="exact">
+            <Enumeration declaredType="Mode" quantity="Mode" min="1" max="2" start="1"/>
+            <Annotations>
+                <Tool name="TestTool"/>
+            </Annotations>
+        </ScalarVariable>
+    </ModelVariables>
+
+    <ModelStructure>
+        <Outputs>
+            <Unknown index="1" dependencies="" dependenciesKind=""/>
+        </Outputs>
+        <Derivatives>
+            <Unknown index="2" dependencies="" dependenciesKind=""/>
+        </Derivatives>
+        <InitialUnknowns>
+            <Unknown index="1" dependencies="" dependenciesKind=""/>
+            <Unknown index="2" dependencies="" dependenciesKind=""/>
+        </InitialUnknowns>
+    </ModelStructure>
+</fmiModelDescription>

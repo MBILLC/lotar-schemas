@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Dedicated URI-restriction test fixture (2026-07-22) for lotar-stc-archival.sch's
+  STC-ARCH-110/111. Synthetic Schematron-only fixture (see the VALID sibling fixture's header for
+  why there is no XSD to validate this fragment against). Each violation below is isolated to
+  exercise exactly one lettered assertion:
+
+    - res-A/@source = "/abs/docs/readme.md"                -> STC-ARCH-110a (absolute path)
+    - res-B/@source = "docs\readme.md"                      -> STC-ARCH-110b (backslash)
+    - res-C/@source = "https://example.com/doc.md"          -> STC-ARCH-110c (scheme)
+    - res-D/@source = "docs/../../../etc/passwd"            -> STC-ARCH-110d (traversal)
+    - res-E/@master = "C:\PLM\vault\obj123"                 -> STC-ARCH-110e (backslash)
+    - res-F/@master = "C:/PLM/vault/obj123"                 -> STC-ARCH-110f (drive-letter-absolute)
+    - res-G/@master = "file:///C:/local/obj123"              -> STC-ARCH-110g (file: scheme)
+    - res-H/Summary/@source = "/abs/summary.md"              -> STC-ARCH-111a (absolute path)
+
+  None of the Resource elements below carry an administrative.size-bytes Classification entry, so
+  the pre-existing STC-ARCH-102a (lotar-stc-archival.sch's Pattern 3) also fires on every one of
+  them — expected and unrelated to the URI checks above; not worth padding out this fixture with
+  Classification boilerplate just to suppress an orthogonal, already-covered rule.
+-->
+<TestFixture xmlns:stc="http://ssp-standard.org/SSPTraceability1/SSPTraceabilityCommon">
+
+  <stc:Resource kind="document" type="text/markdown" source="/abs/docs/readme.md" id="res-A"/>
+  <stc:Resource kind="document" type="text/markdown" source="docs\readme.md" id="res-B"/>
+  <stc:Resource kind="document" type="text/markdown" source="https://example.com/doc.md" id="res-C"/>
+  <stc:Resource kind="document" type="text/markdown" source="docs/../../../etc/passwd" id="res-D"/>
+
+  <stc:Resource kind="model" type="application/x-fmu-sharedlibrary" source="models/Comp1.fmu"
+                master="C:\PLM\vault\obj123" id="res-E"/>
+  <stc:Resource kind="model" type="application/x-fmu-sharedlibrary" source="models/Comp1.fmu"
+                master="C:/PLM/vault/obj123" id="res-F"/>
+  <stc:Resource kind="model" type="application/x-fmu-sharedlibrary" source="models/Comp1.fmu"
+                master="file:///C:/local/obj123" id="res-G"/>
+
+  <stc:Resource kind="document" type="text/markdown" source="docs/readme.md" id="res-H">
+    <stc:Summary type="text/markdown" source="/abs/summary.md"/>
+  </stc:Resource>
+
+</TestFixture>

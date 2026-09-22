@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Dedicated URI-restriction test fixture (2026-07-22) for lotar-p520-uri.sch's P520-ARCH-001.
+  Model_Summary_Report = "http://example.com/vv-summary.pdf" exercises P520-ARCH-001c (scheme).
+-->
+<TestFixture xmlns:p520="http://www.lotar.org/schemas/mbse/p520#">
+  <p520:Model_Summary_Report>http://example.com/vv-summary.pdf</p520:Model_Summary_Report>
+</TestFixture>

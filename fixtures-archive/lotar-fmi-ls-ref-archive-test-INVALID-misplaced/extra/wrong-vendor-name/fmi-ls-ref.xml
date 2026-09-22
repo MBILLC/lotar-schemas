@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Layer-2 integration fixture (2026-07-22) for lotar_uri_resolve_check.py's _fmu_root_via_extra():
+  the misplacement case. This manifest's own fmi-ls:fmi-ls-name identifies it as
+  "org.fmi-standard.fmi-ls-ref", but it is deliberately packaged under
+  "extra/wrong-vendor-name/" instead of "extra/org.fmi-standard.fmi-ls-ref/" — expected to FAIL
+  with a placement error before any Related/@source value is even resolved, regardless of whether
+  the referenced files exist.
+-->
+<fmiReferences xmlns:fmi-ls="http://fmi-standard.org/fmi-ls-manifest"
+                fmi-ls:fmi-ls-name="org.fmi-standard.fmi-ls-ref"
+                fmi-ls:fmi-ls-version="1.0.0-alpha"
+                fmi-ls:fmi-ls-description="Layered Standard providing information on related files included in an FMU.">
+  <Related source="documentation/UserGuide.pdf" role="document" type="application/pdf"/>
+</fmiReferences>

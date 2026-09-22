@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Deliberately minimal/non-compliant fixture. Structurally valid against
+  SystemStructureDescription.xsd (2.0.1); validate that first, then note it intentionally
+  violates several lotar-ssp2.0.1-archival.sch rules to exercise both the [M] and [I] tiers:
+
+    - SSP-ARCH-001a [M]: no @id on the root element
+    - SSP-ARCH-003a/003b [M]: no @generationTool/@generationDateAndTime
+    - SSP-ARCH-010 [M]: Component with no @type (silently falls back to the XSD default)
+    - SSP-ARCH-011 [R]: same Component has no @source either
+    - SSP-ARCH-020 [M]: Connector with no type choice element (promoted R->M 2026-07-21; see
+      FMISchematron/lotar-ssp2.0.1-archival.sch header note)
+    - SSP-ARCH-030 [I]: MetaData with BOTH @source and inline Content (mutual-exclusion violation)
+    - SSP-ARCH-033 [I]: ParameterBinding with NEITHER @source NOR inline ParameterValues
+    - SSP-ARCH-040 [I]: two Enumeration entries sharing the same @name
+
+  REVISION (2026-07-21): @description/@author/@fileversion/@copyright/@license on the root are no
+  longer independently checked here (SSP-ARCH-001b/002a-d removed) — those fields were migrated
+  to be SRMD-mandatory instead and are now [O] on the SSD side; this fixture is SSD-only (no
+  accompanying SRMD instance) so that layer isn't exercised by this file. SSP-ARCH-012
+  (Component/@implementation, [M]) is NOT triggered by this fixture's Component either, since that
+  rule only applies when @type="application/x-fmu-sharedlibrary" and this Component's @type is
+  already omitted (covered instead by SSP-ARCH-010's failure).
+-->
+<ssd:SystemStructureDescription
+    xmlns:ssd="http://ssp-standard.org/SSP1/SystemStructureDescription"
+    xmlns:ssc="http://ssp-standard.org/SSP1/SystemStructureCommon"
+    version="2.0"
+    name="LOTAR-SSP-Test-Minimal-Invalid">
+
+  <ssd:System name="S">
+    <ssd:Connectors>
+      <ssd:Connector name="in1" kind="input"/>
+    </ssd:Connectors>
+    <ssd:ParameterBindings>
+      <ssd:ParameterBinding>
+        <ssc:MetaData kind="general" type="text/plain" source="resources/meta.txt">
+          <ssc:Content>This element illegally has both @source and inline Content.</ssc:Content>
+        </ssc:MetaData>
+      </ssd:ParameterBinding>
+    </ssd:ParameterBindings>
+    <ssd:Elements>
+      <ssd:Component name="Comp1"/>
+    </ssd:Elements>
+  </ssd:System>
+
+  <ssd:Enumerations>
+    <ssc:Enumeration name="DupName">
+      <ssc:Item name="A" value="0"/>
+    </ssc:Enumeration>
+    <ssc:Enumeration name="DupName">
+      <ssc:Item name="B" value="1"/>
+    </ssc:Enumeration>
+  </ssd:Enumerations>
+
+</ssd:SystemStructureDescription>

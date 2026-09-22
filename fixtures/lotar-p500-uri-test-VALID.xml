@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Dedicated URI-restriction test fixture (2026-07-22) for lotar-p500-uri.sch's P500-ARCH-001
+  (Link relative-only) and P500-ARCH-010 (Copyright/License/Export_Controls/Model_Dependency/
+  Model_Hierarchy/Privacy_Rules no-local-leakage). Synthetic Schematron-only fixture: P500_Series_
+  Common.xsd's types are only ever embedded inside a part-specific manifest (P510/P515/P520/P550),
+  so this uses a lightweight non-standard wrapper root purely to exercise the "//p500:*" XPath
+  contexts — real embedded coverage of Copyright/License/Export_Controls/Model_Dependency/
+  Model_Hierarchy/Privacy_Rules exists in fixtures/lotar-p520-test-full-VALID.xml (2026-09-05,
+  D-23; formerly the P515 fixture, whose all-urn: values this pattern must continue to accept).
+-->
+<TestFixture xmlns:p500="http://www.lotar.org/schemas/mbse/p500#">
+  <p500:Link>reports/summary.pdf</p500:Link>
+  <p500:Copyright>urn:copyright:example</p500:Copyright>
+  <p500:License>https://creativecommons.org/licenses/by/4.0/</p500:License>
+  <p500:Export_Controls>urn:export:none</p500:Export_Controls>
+  <p500:Model_Dependency>urn:dep:none</p500:Model_Dependency>
+  <p500:Model_Hierarchy>urn:hierarchy:top</p500:Model_Hierarchy>
+  <p500:Privacy_Rules>urn:privacy:none</p500:Privacy_Rules>
+</TestFixture>

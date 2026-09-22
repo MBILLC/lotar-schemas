@@ -1,0 +1,763 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+	vc:minVersion="1.1"
+	elementFormDefault="qualified"
+	xmlns:tns="http://www.lotar.org/schemas/mbse/p520#"
+	xmlns:p500="http://www.lotar.org/schemas/mbse/p500#"
+	targetNamespace="http://www.lotar.org/schemas/mbse/p520#"
+	attributeFormDefault="unqualified">
+
+	<xs:import namespace="http://www.lotar.org/schemas/mbse/p500#" schemaLocation="P500_Series_Common.xsd"/>
+
+	<!--
+		FMI-LS-ref import (moved from P515_SCHEMA.xsd, D-23, 2026-09-05; originally 2026-07-20)
+		=========================================================================
+		NOTE ON NAMESPACE STYLE: this schema deliberately declares no default namespace (see below).
+		Vendored from modelica/fmi-ls-ref PR #36 (not yet merged upstream; wired in on the
+		explicit instruction to execute the P515_FMI_LS_Ref_Plan.md plan assuming it merges;
+		the xs:import->xs:include fix landed separately via PR #40, see T-29). This schema has
+		no target namespace of its own, so no namespace= attribute is given here (matches how
+		fmi3LayeredStandardReferenceManifest.xsd itself imports fmi3Annotation.xsd). Provides
+		the TRelated/TLabel/fmiReferences definitions that P520_Related_Type (below) extends.
+
+		CHANGED ON INTEGRATION (D-23): P515 kept a default namespace (xmlns="...p515#") and
+		reset it with xmlns="" on P515_Related_Type so that base="TRelated" would reach the
+		no-namespace type. That never compiled under xmlschema (it resolved the unprefixed name
+		to the target namespace anyway), the "TRelated fails to resolve" gap recorded in
+		xml_form_app's registry and HANDOVER.md. A chameleon <xs:include> was tried first and
+		rejected: fmi3LayeredStandardReferenceManifest.xsd declares
+		attributeFormDefault="qualified", so absorbing it into the p520 namespace would have
+		made @source/@role/@checksum p520-qualified in instances, breaking the FMI-LS-ref
+		attribute convention. Fix actually applied: this schema declares NO default namespace
+		(only xmlns:tns for its own target namespace) and every reference to one of its own
+		types is written tns:Foo, so the one unprefixed reference left, base="TRelated",
+		resolves to the no-namespace type in every processor with no tricks. Verified
+		2026-09-05: compiles under lxml.etree.XMLSchema AND xmlschema.XMLSchema11, and
+		fixtures/lotar-p520-test-full-VALID.xml validates under both. No instance change:
+		TRelated's attributes stay unqualified, exactly as in the former P515 fixtures.
+	-->
+	<xs:import schemaLocation="../schemas-vendored/fmi3LayeredStandardReferenceManifest.xsd"/>
+
+	<xs:complexType name="P520_ManifestType">
+		<xs:sequence>
+			<xs:element name="GeneralPLMInfo" type="p500:GeneralPLMInfoType">
+				<xs:annotation>
+					<xs:documentation> General Product Lifecycle Management (PLM) metadata and
+						properties. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ModelDev_Integration_Execution" type="tns:ModelDev_Integration_Execution_Type">
+				<xs:annotation>
+					<xs:documentation> Development, integration, and execution environment
+						details for the PLM model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Integration_Process" type="tns:Integration_Process_Type">
+				<xs:annotation>
+					<xs:documentation> Information about the integration process of the model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element name="Physics_Content_and_Usage" type="tns:Physics_Content_and_Usage_Type">
+				<xs:annotation>
+					<xs:documentation> Physics content and usage characteristics of the model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Model_Variables" type="tns:Model_Variables_Type">
+				<xs:annotation>
+					<xs:documentation> Key variables of the model, including inputs, outputs,
+						parameters, and other relevant variables. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Verification_Validation" type="tns:Verification_Validation_Type">
+				<xs:annotation>
+					<xs:documentation> Verification and validation information for the model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+        </xs:sequence>
+	</xs:complexType>
+
+    <!--
+        The types formerly duplicated here (GeneralPLMInfoType, Traceability_Link_Type,
+        LinkTypeInterpretation, ContentTypeType) now live in P500_Series_Common.xsd and are
+        imported above under the p500: prefix, since they are shared verbatim with P510 (and, historically, P515 — integrated into this schema 2026-09-05, D-23).
+    -->
+
+
+   <!--SPECIFIC P520 definitions-->
+	<xs:complexType name="ModelDev_Integration_Execution_Type">
+		<xs:sequence>
+            <xs:element name="DevTool_Name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Name of the development tool used for requirements. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DevTool_Version" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Version of the development tool used for requirements. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DevTool_License" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> License of the development tool used for requirements. </xs:documentation>
+				</xs:annotation>
+
+			</xs:element>
+			<xs:element name="DevOS_Name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Name of the development operating system. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DevOS_Version" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Version of the development operating system. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DevOS_License" type="xs:string"><!--Specific-->
+				<xs:annotation>
+					<xs:documentation> License of the development operating system. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+            <!--Specific-->
+            <xs:element name="DevOS_Compiler_Name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Name of the development OS compiler. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+            <xs:element name="DevOS_Compiler_Version" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Version of the development OS compiler. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+            <xs:element name="DevOS_Compiler_License" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> License of the development OS compiler. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element name="Dev_Language" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Programming language used for development. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CPU_Number" type="xs:int">
+				<xs:annotation>
+					<xs:documentation> Number of CPUs used in the development environment. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+            <xs:element name="RAM_Size" type="xs:int">
+				<xs:annotation>
+					<xs:documentation> Size of RAM (in MB) used in the development environment. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+            <xs:element name="Target_Tool_Name" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Name of the target tool used for integration/execution. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+		</xs:sequence>
+	</xs:complexType>
+
+
+     <!--Specific-->
+<xs:complexType name="Integration_Process_Type">
+		<xs:sequence>
+			<xs:element name="Coupling_Mode" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Mode of coupling for the model integration. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Communication_Mode" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Mode of communication for the model integration. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Model_Format" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Format of the model used in the integration. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Real_Time" type="xs:boolean" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Indicates if the model operates in real-time. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+            <xs:element name="Parallelization" type="xs:boolean" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Indicates if the model supports parallelization. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+            <xs:element name="Model_Type" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Type of the model used in the integration. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+            <xs:element name="Libraries_Dependencies" type="xs:string" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Libraries dependencies required for the model integration. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+            <xs:element name="OS_Functions_Dependencies" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Operating system functions dependencies required for the model integration. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		    <xs:element name="Solver_Dependencies" type="xs:string" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Solver dependencies required for the model integration. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+            <xs:element name="Link_Resources" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Linked resources required for the model integration. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+     <!--Specific-->
+    <xs:complexType name="Physics_Content_and_Usage_Type">
+		<xs:sequence>
+			<xs:element name="Dimension" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Dimension of the physical model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Method" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Method used in the physical model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Physics_Domain" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Physics domain of the model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TimeScale" type="xs:boolean" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Indicates if the model includes time scale considerations. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+            <xs:element name="Linearity" type="xs:boolean" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Indicates if the model is linear. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+            <xs:element name="Model_Type_Usage" type="xs:string"  minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Usage type of the model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+            <xs:element name="Environment" type="xs:string"  minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Environment in which the model is used. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+            <xs:element name="Validate_Range" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Validation range of the model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+		    <xs:element name="Fidelity_Represented_Phenomena" type="xs:string" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Fidelity of the represented phenomena in the model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+            <xs:element name="Fidelity_Neglected_Phenomena" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Fidelity of the neglected phenomena in the model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+     <!--Specific-->
+    <xs:complexType name="Model_Variables_Type">
+		<xs:sequence>
+			<xs:element name="Key_Inputs" type="tns:Key_Value_Type" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Key input variables of the model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Key_Outputs" type="tns:Key_Value_Type" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Key output variables of the model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Key_Parameters" type="tns:Key_Value_Type" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Key parameter variables of the model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Signal_Dictionary" type="tns:Key_Value_Type" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Signal dictionary of the model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+            <xs:element name="Other_Variables" type="tns:Key_Value_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Other relevant variables of the model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+    	</xs:sequence>
+	</xs:complexType>
+
+ <xs:complexType name="Key_Value_Type">
+		<xs:sequence>
+			<xs:element name="Name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Name of the variable. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Value" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Value of the variable. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element name="Description" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Description of the variable. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+    	</xs:sequence>
+	</xs:complexType>
+
+    <!--
+        ==========================================================================
+        Behavioral-model test cases (integrated from NAS9300-515, D-23, 2026-09-05)
+        ==========================================================================
+        The types below were authored under P515_SCHEMA.xsd and moved here verbatim
+        (except for the P515_Related_Type -> P520_Related_Type rename and the file/rule-id
+        references) when the behavioral-model part of P515 was integrated into P520. A
+        TestCase now nests under Verification_Validation_Scenario_Type (Option A,
+        P515_P520_Integration_Plan.md Sec.2.1): a scenario is the V&V intent, its test cases
+        are the concrete experiments with reference results that realize it. The former
+        P515 root (P515_ManifestType) and BehavioralModelReportType (ModelLinking + TestCase
+        list) were not moved: the model link is the enclosing P520 manifest itself.
+        Original design history: planning/P515_FMI_LS_Ref_Plan.md, decisions log 2026-07-20.
+    -->
+    <!--
+        P520_Related_Type (2026-07-20) — FMI-LS-ref-based file-artifact link type
+        ==========================================================================
+        Decision (executing P515_FMI_LS_Ref_Plan.md §3/§6 (design record; content now lives in P520, D-23), assuming fmi-ls-ref PR #36 is
+        merged): concrete file artifacts referenced from a test case — the InputFile and
+        ReferenceResults elements below — migrate from the generic p500:Traceability_Link_Type
+        to this FMI-LS-ref-derived type, since that is exactly what TRelated was built for and
+        exactly where PD1 (fixity/checksum) and PD4 (size) bite hardest. ModelLinking and
+        Context.ContextLink are NOT migrated: they stay on p500:Traceability_Link_Type, since
+        they link to other Digital Objects/contexts (inter-object relationships, PD8/GR4/D5,
+        already deferred to P550) rather than to a single concrete file whose bytes need fixity
+        and size captured.
+
+        TRelated (no target namespace; imported unqualified above) already provides @source,
+        @role, @type (MIME), @description, and @checksum/@checksumType — but @checksum is only
+        OPTIONAL there. XSD extension cannot tighten an inherited attribute's `use` from
+        optional to required in the same step it adds a new attribute (that would require
+        restriction, which is mutually exclusive with extension here) — so @checksum is left
+        as declared by the base type, and lotar-p520-archival.sch enforces it as mandatory for
+        archival on InputFile, mirroring the FMI2/FMI3 archival Schematron pattern exactly.
+        ReferenceResults is the one exception (revised 2026-07-20): its @checksum is NOT
+        Schematron-enforced, because the pre-existing sibling element ReferenceFileHash already
+        carries a fixity digest of the same reference results file — ReferenceFileHash is kept
+        as the sole authoritative mechanism for that one field, to avoid two parallel hashes of
+        one artifact; see the ReferenceResults element's own annotation below for detail.
+
+        sizeBytes is added here because TRelated has no size-in-bytes field at all (a gap
+        flagged in P515_FMI_LS_Ref_Plan.md §5); this follows the plan's recommended Option A
+        (a required attribute on an extension) over Option B (carrying size via TRelated's
+        Annotations extensibility point), since PD4 warrants a schema-level guarantee rather
+        than a loosely-coupled annotation.
+
+        (Historical note: in P515 this type carried xmlns="" to reach the no-namespace
+        TRelated. Dropped on integration; this schema now has no default namespace at all, so
+        the unprefixed base="TRelated" below is a no-namespace reference by construction. See
+        the import's comment near the top of this file.)
+    -->
+    <xs:complexType name="P520_Related_Type">
+        <xs:annotation>
+            <xs:documentation>
+                Extension of fmi-ls-ref's TRelated adding a mandatory sizeBytes attribute
+                (PD4). Used for concrete file-artifact links (InputFile, ReferenceResults);
+                see the block comment above for the full rationale and the ModelLinking/
+                ContextLink exclusion.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="TRelated">
+                <xs:attribute name="sizeBytes" type="xs:nonNegativeInteger" use="required">
+                    <xs:annotation>
+                        <xs:documentation>
+                            Size of the referenced file in bytes, required for archival (PD4).
+                            Not present on the upstream TRelated base type.
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="TestCaseType" >
+        <xs:sequence>
+            <xs:element name="Context" type="tns:ContextType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation> Context information for the test case. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Scenario" type="tns:ScenarioType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation> Scenario definition for the test case. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+
+            <xs:element name="ReferenceVariables" type="tns:ReferenceVariablesType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation> Reference variables and expected results for the test case. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID" use="optional">
+            <xs:annotation>
+                <xs:documentation>Fragment anchor for one test case (D-24): an STMD ImplementTestCase/Output may
+                    reference it as P520_Manifest.xml#&lt;id&gt;.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="ContextType" >
+        <xs:sequence>
+            <xs:element name="Number" type="xs:int" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation> Identifier number for the test case context. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Description" type="xs:string" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation> Description of the test case context. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="ContextLink" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation> Links related to the test case context. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Relative_path" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation> Relative paths relevant to the test case context. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ScenarioType" >
+        <xs:sequence>
+            <xs:element name="ExperimentDefinition" type="tns:ExperimentDefinitionType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation> Definition of the experiment for the test case scenario. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="PropertyModifications" type="tns:PropertyModificationsType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation> Modifications to properties for the test case scenario. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="BoundaryConditions" type="tns:BoundaryConditionsType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation> Boundary conditions for the test case scenario. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ExperimentDefinitionType" >
+        <xs:sequence>
+            <xs:element name="Algorithm" type="tns:AlgorithmType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation> Algorithm used in the experiment. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Ncp" type="xs:int" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation> Number of communication points in the experiment. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Start_time" type="xs:float" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation> Start time of the experiment. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+
+            <xs:element name="Stop_time" type="xs:float" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation> Stop time of the experiment. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Tolerance" type="xs:float" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation> Tolerance level for the experiment. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="PropertyModificationsType" >
+        <xs:sequence>
+            <xs:element name="Property" type="tns:VariableNameValueModType" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation> Property modifications for the test case scenario. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="BoundaryConditionsType" >
+        <xs:sequence>
+            <xs:element name="Constant" type="tns:VariableNameValueModType" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation> Constant boundary conditions for the test case scenario. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="InputFile" type="tns:P520_Related_Type" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation> Input file for boundary conditions in the test case
+                        scenario. Migrated 2026-07-20 from p500:Traceability_Link_Type to
+                        P520_Related_Type (FMI-LS-ref-based; see the type definition above).
+                        @role is required to be "configuration" (revised 2026-07-21; supersedes
+                        the 2026-07-20 "parameter" confirmation — closed enum inherited from
+                        TRelated has no boundary-condition-specific value, "configuration" is now
+                        the confirmed fit), enforced by lotar-p520-archival.sch's
+                        P520-ARCH-100d. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ReferenceVariablesType" >
+        <xs:sequence>
+            <xs:element name="Variable" type="xs:string" minOccurs="1" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation> Reference variable names for the test case. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Tolerance" type="tns:ToleranceType" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation> Tolerance settings for the reference variables. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="ReferenceResults" type="tns:P520_Related_Type" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation> Link to the reference results file for the test case.
+                        Migrated 2026-07-20 from p500:Traceability_Link_Type to
+                        P520_Related_Type (FMI-LS-ref-based; see the type definition above).
+                        @role is required to be "result" (confirmed 2026-07-20; best fit in
+                        TRelated's closed enum), enforced by lotar-p520-archival.sch's
+                        P520-ARCH-101b. NOTE (resolved 2026-07-20): this element's own
+                        @checksum/@checksumType are inherited from TRelated and remain
+                        structurally permitted, but are deliberately NOT required for
+                        archival — the sibling ReferenceFileHash element below is the sole
+                        authoritative fixity mechanism for the reference results file, to
+                        avoid two parallel, potentially-diverging hashes of the same
+                        artifact. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <!-- Definition of the ReferenceFileHash element (sole authoritative fixity
+                 mechanism for the reference results file — see the note on ReferenceResults
+                 above; reinforced as mandatory in lotar-p520-archival.sch,
+                 P520-ARCH-102/103, 2026-07-20). -->
+            <xs:element name="ReferenceFileHash">
+                <xs:complexType>
+                <xs:attribute name="type" use="required">
+                    <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <!-- Restrict the type attribute to specific hash algorithms -->
+                        <xs:enumeration value="sha256"/>
+                        <xs:enumeration value="sha1"/>
+                        <xs:enumeration value="md5"/>
+                    </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="value" use="required">
+                    <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <!-- Restrict value to a valid hexadecimal string -->
+                        <xs:pattern value="[0-9a-fA-F]{64}"/>
+                    </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ToleranceType" >
+        <xs:sequence>
+            <xs:element name="Absolute_tolx" type="xs:float" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation> Absolute tolerance for the x variable. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Absolute_toly" type="xs:float" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation> Absolute tolerance for the y variable. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Relative_tolx" type="xs:float" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation> Relative tolerance for the x variable. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="Relative_toly" type="xs:float" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation> Relative tolerance for the y variable. </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+
+    <xs:simpleType name="AlgorithmType">
+        <xs:annotation>
+            <xs:documentation> Numerical algorithm used in the experiment.</xs:documentation>
+        </xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="FMICSAlg"/>
+			<xs:enumeration value="Euler-Explicit"/>
+			<xs:enumeration value="Euler-Implicit"/>
+			<xs:enumeration value="Runge-Kutta-2"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+     <xs:complexType name="VariableNameValueModType" >
+        <xs:annotation>
+            <xs:documentation> Structure to define variable name and its modified value. </xs:documentation>
+        </xs:annotation>
+         <xs:attribute name="name" type="xs:string" use="required"/>
+         <xs:attribute name="value" type="xs:string" use="required"/>
+    </xs:complexType>
+
+     <!--
+        Note: unlike GeneralPLMInfoType/Traceability_Link_Type/LinkTypeInterpretation/ContentTypeType,
+        Verification_Validation_Type was never present in P515_SCHEMA.xsd, so it stays specific to P520
+        rather than moving to the common schema (the original "Common" label in this file was
+        aspirational, not actually shared).
+     -->
+ <xs:complexType name="Verification_Validation_Type">
+		<xs:sequence>
+			<xs:element name="Verification_Validation_Scenario" type="tns:Verification_Validation_Scenario_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Verification and validation scenarios for the model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+    	</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Verification_Validation_Scenario_Type">
+		<xs:sequence>
+			<xs:element name="Id" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Identifier for the verification/validation scenario. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Verification_Credibility_Level" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Verification credibility level for the scenario. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Validation_Credibility_Level" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Validation credibility level for the scenario. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:choice minOccurs="0">
+				<xs:element name="Validated_by" type="p500:Traceability_Link_Type">
+					<xs:annotation>
+						<xs:documentation> Link to the resource that validates the model. </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="Verified_by" type="p500:Traceability_Link_Type">
+					<xs:annotation>
+						<xs:documentation> Link to the resource that verifies the model. </xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:choice>
+			<!-- Validated_by/Verified_by relaxed to optional (D-23): a scenario's evidence may
+			     instead be its inline TestCase elements below. lotar-p520-archival.sch's
+			     P520-ARCH-003 requires at least one of TestCase, Validated_by, Verified_by. -->
+			<xs:element name="Model_Summary_Report" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation> URI to the summary report of the model verification/validation. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Implements" type="p500:Traceability_Link_Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Link from this scenario's Model Report to the governing Credible Decision
+						Process (CDP) record (a DTMD instance, org.lotar-international.lotar-core's
+						SSP-LS-Traceability-based process schema) that triggered the simulation
+						effort this scenario documents. Distinct from Validated_by/Verified_by
+						above, which link to external test-case/reference-result artifacts (formerly P515-governed;
+						inline TestCase elements below are the integrated form, D-23)
+						that verify or validate the model itself; the CDP decision sits logically
+						"above" the Model Report (it is what commissioned the work in the first
+						place), not beside it as another verification/validation artifact, hence a
+						separate element rather than a third choice branch. Populate Name with
+						"implements" (Traceability_Link_Type's free-text relationship-name field) to
+						record the relation explicitly, mirroring this project's existing
+						relation-labeling convention (see NAS9300-500 Appendix B's
+						&lt;relation&gt;('Uses', ...)&lt;/relation&gt; pattern). Optional at the XSD
+						level (not every scenario is necessarily governed by a recorded CDP
+						decision); see the P520 risk-profile normative clause for when population is
+						actually mandatory.
+
+						Placement (D-21b, decided 2026-08-06): Link must be a bare filename (no
+						path separator) resolving to a .dtmd file located in the SAME folder as the
+						P520_Manifest.xml instance that contains this element. This is one per-model
+						folder holding three siblings: the P520_Manifest.xml itself, the governing
+						.dtmd record, and the SSP or FMU package this manifest describes (the
+						package's own internal layout is unaffected by this rule). See
+						P520_Risk_Profile_Normative_Clause.md Sec.5.7 for the concrete layout and
+						lotar-p520-uri.sch's P520-ARCH-002 pattern for the enforced syntax rules.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TestCase" type="tns:TestCaseType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>
+						Behavioral-model test case realizing this scenario (integrated from
+						P515, D-23): numerical experiment definition, property/boundary-condition
+						overrides, reference variables with tolerances, and the reference-results
+						file with its fixity hash. One scenario may carry several test cases
+						(operating points, solvers). The risk-scaled STMD/MTMD steps
+						DefineTestCaseRequirements / DefineTestCaseDesignSpecification /
+						ImplementTestCase point at this content (P520 risk-profile clause Sec.4.4).
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:ID" use="optional">
+			<xs:annotation>
+				<xs:documentation>Fragment anchor (D-24, 2026-09-05): a process record points at this scenario with
+					stc:ResourceReference xlink:href="P520_Manifest.xml#&lt;id&gt;", the credible-process layer's
+					fragment convention (credible-process-schemas docs/07-conformance.md). Optional; required in
+					practice whenever an STMD step's Output references this scenario (P520 clause Sec. 4.5.3).</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+
+
+<xs:element name="P520_Manifest" type="tns:P520_ManifestType">
+	<xs:annotation>
+		<xs:documentation> Root element for the P520 Manifest schema. </xs:documentation>
+	</xs:annotation>
+</xs:element>
+
+
+</xs:schema>

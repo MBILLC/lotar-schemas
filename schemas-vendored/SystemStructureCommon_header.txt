@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Source: already vendored in this project at SSP-schema-2.0.1/SystemStructureCommon.xsd
+    (Modelica Association Project "SSP", v2.0.1). Byte-identical copy placed at
+    ssp-standard/schema/SystemStructureCommon.xsd within schemas-vendored/ itself, 2026-08-14
+    (D-22/T-18 XAdES signature backport), because STC.xsd/STMD.xsd/DTMD.xsd/MTMD.xsd's own
+    xs:import declares this exact relative schemaLocation
+    ("ssp-standard/schema/SystemStructureCommon.xsd") and scripts/sign_lifecycle_entry.py /
+    scripts/verify_signatures.py need it resolvable offline, alongside xlink.xsd (also newly
+    added here, reconstructed copy — see xlink.xsd's own header comment), for xmlschema.XMLSchema11
+    to compile DTMD.xsd/STMD.xsd/MTMD.xsd without network access. No content changed from the
+    SSP-schema-2.0.1 copy; self-contained, no further xs:import/xs:include of its own (confirmed
+    directly, matching T-18's plan note that STC.xsd's earlier "unresolved" flag was about this
+    import as a standalone-compilable root, not about the file's own content).
+-->

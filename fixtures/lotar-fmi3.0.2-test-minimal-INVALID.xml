@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Deliberately-broken fixture. Should trip multiple hard [I]/[M] rules in
+     lotar-fmi3.0.2-archival.sch on a single validation pass. Intentional
+     violations, one per numbered comment below, each tagged with the rule
+     ID it should fire: -->
+<fmiModelDescription fmiVersion="3.0.2"
+                      modelName="LOTAR.Test.MinimalInvalid"
+                      instantiationToken="{00000000-0000-0000-0000-000000000000}">
+  <!-- (no description/author/copyright/license/generationTool/
+       generationDateAndTime/variableNamingConvention at all -> trips every
+       provenance rule FMI3-ARCH-010a..010g in lotar-fmi3.0.2-provenance.sch) -->
+
+  <!-- 1. Hybrid interface -> FMI3-ARCH-020a (exactly one required, two given) -->
+  <ModelExchange modelIdentifier="lotarTestInvalidME"/>
+  <CoSimulation modelIdentifier="lotarTestInvalidCS"/>
+
+  <UnitDefinitions>
+    <Unit name="dup">
+      <BaseUnit m="1"/>
+    </Unit>
+    <!-- 2. Duplicate Unit/@name -> FMI3-ARCH-030a -->
+    <Unit name="dup">
+      <BaseUnit s="1"/>
+    </Unit>
+  </UnitDefinitions>
+
+  <TypeDefinitions>
+    <!-- 3. TypeDefinitions/@name collides with a ModelVariables/@name below
+         ("badVar") -> FMI3-ARCH-040c -->
+    <Float64Type name="badVar" min="0" max="10"/>
+  </TypeDefinitions>
+
+  <ModelVariables>
+    <!-- 4. Float64 with max < min -> FMI3-ARCH-090b -->
+    <Float64 name="badVar" valueReference="1" causality="output" min="10" max="0" start="5"/>
+
+    <!-- 5. Float64 with @start token out of [min,max] bounds -> FMI3-ARCH-090d -->
+    <Float64 name="outOfRange" valueReference="2" causality="output" min="0" max="10" start="0 5 99"/>
+
+    <!-- 6. Dimension with BOTH @start and @valueReference -> FMI3-ARCH-080a -->
+    <Float64 name="badDim" valueReference="3" causality="local" start="1 2">
+      <Dimension start="2" valueReference="1"/>
+    </Float64>
+
+    <!-- 7. Clock: output causality WITH @priority -> FMI3-ARCH-120a -->
+    <!-- 8. Same Clock: intervalVariability="constant" but NO @intervalDecimal
+         -> FMI3-ARCH-120c -->
+    <!-- 9. Same Clock: mixes decimal-group (@shiftDecimal) with
+         counter-group (@intervalCounter) -> FMI3-ARCH-120n (also trips
+         120f is satisfied since shiftDecimal has no intervalDecimal present
+         -> FMI3-ARCH-120f fires too: shiftDecimal requires intervalDecimal) -->
+    <Clock name="badClock" valueReference="4" causality="output"
+           priority="1" intervalVariability="constant"
+           shiftDecimal="0.5" intervalCounter="10" supportsFraction="true"/>
+
+    <!-- 10. Duplicate variable @name across kinds -> FMI3-ARCH-070d -->
+    <Boolean name="badVar" valueReference="5" causality="local" start="false"/>
+
+    <!-- 11. EnumerationType-style variable-level max NOT strictly > min
+         (equal) -> FMI3-ARCH-110a -->
+    <Enumeration name="badEnum" valueReference="6" causality="output" min="2" max="2" start="2"/>
+  </ModelVariables>
+
+  <ModelStructure>
+    <!-- 12. dependenciesKind present without dependencies -> FMI3-ARCH-131c -->
+    <Output valueReference="1" dependenciesKind="dependent"/>
+  </ModelStructure>
+
+  <Annotations>
+    <Annotation type="dup.type">First.</Annotation>
+    <!-- 13. Duplicate Annotation/@type within the same Annotations list ->
+         FMI3-ARCH-140a -->
+    <Annotation type="dup.type">Second, colliding type.</Annotation>
+  </Annotations>
+
+</fmiModelDescription>

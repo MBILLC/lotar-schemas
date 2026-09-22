@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Dedicated test fixture (2026-08-06, D-21/D-21b) for lotar-p520-uri.sch's P520-ARCH-002.
+  Link="subfolder/DecisionTask.dtmd" exercises P520-ARCH-002b (contains a path separator, not a
+  bare filename, so not "the same folder" per D-21b) while still ending in ".dtmd" (002d passes)
+  and still being present (002a passes) and containing no backslash (002c passes). Name="uses"
+  exercises P520-ARCH-002e (must read exactly "implements"). Expected exactly two failed asserts:
+  P520-ARCH-002b, P520-ARCH-002e.
+-->
+<TestFixture xmlns:p520="http://www.lotar.org/schemas/mbse/p520#"
+             xmlns:p500="http://www.lotar.org/schemas/mbse/p500#">
+  <p520:Implements>
+    <p500:Link>subfolder/DecisionTask.dtmd</p500:Link>
+    <p500:Name>uses</p500:Name>
+  </p520:Implements>
+</TestFixture>

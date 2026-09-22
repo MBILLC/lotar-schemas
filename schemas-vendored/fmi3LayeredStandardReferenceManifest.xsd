@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Vendored copy — provenance
+  ==========================
+  Source:      modelica/fmi-ls-ref, pull request #36
+               (https://github.com/modelica/fmi-ls-ref/pull/36)
+  Retrieved:   2026-07-20 — cloned repo, fetched PR #36 head (commit 12e0990), confirmed via
+               `git show` that the schema content is unchanged since commit 566241e ("Match
+               SRMD attributes, drop top-level attribute"); the PR's later commit only touches
+               an example/documentation file, not this schema.
+  Status:      PR #36 is NOT YET MERGED upstream as of retrieval. Vendored and wired into
+               P515_SCHEMA.xsd on the explicit instruction to "execute the P515 plan assuming
+               .../pull/36 is merged" (2026-07-20). If the PR changes materially before merging,
+               this file and the P515 schema/Schematron built on it need to be re-checked against
+               the final merged version.
+  Modified from upstream: (1) the two dependency schemaLocation values below were changed from
+               the PR's raw.githubusercontent.com URLs to local relative filenames
+               (fmi3LayeredStandardManifest.xsd, fmi3Annotation.xsd), matching this project's
+               established convention of vendoring same-directory dependencies (see SRMD.xsd's
+               relative import of STC.xsd) instead of resolving imports over the network at
+               validation time. (2) The fmi3Annotation.xsd dependency was changed from
+               <xs:import> to <xs:include> (2026-07-20, discovered during validation, not a
+               judgment call to flag lightly): this schema document has no targetNamespace of
+               its own, and fmi3Annotation.xsd also has no targetNamespace — importing "no
+               namespace" components into a schema that is itself in "no namespace" is invalid
+               under the XSD 1.0 import constraints (confirmed via lxml/libxml2 schema
+               compilation, which rejected the original <xs:import
+               schemaLocation="fmi3Annotation.xsd"/> form with: "the attribute 'namespace' must
+               be existent if the importing schema has no target namespace"); <xs:include> is
+               the correct construct for pulling in same-namespace (here, no-namespace)
+               components. This defect appears to exist in the actual upstream PR #36 content
+               as retrieved (it used the same <xs:import>, just with a raw.githubusercontent.com
+               URL) — flagged to the user as a real deviation from the literal PR text, not a
+               silent fix. (3) The @checksumType attribute on TRelated originally declared BOTH
+               type="xs:string" AND an inline <xs:simpleType> child restricting to the SHA3-*/
+               SHA-* enumeration — also invalid under XSD 1.0 (an attribute's `type` and inline
+               `<simpleType>` child are mutually exclusive), also confirmed via lxml/libxml2
+               compilation, also present in the upstream PR #36 content as retrieved. Fixed by
+               removing the redundant type="xs:string" and keeping the inline simpleType
+               restriction (no loss of constraint, just removal of the conflicting duplicate
+               declaration). Two genuine schema defects found in PR #36 as currently written,
+               both flagged to the user rather than silently absorbed.
+  Note on optionality: in this upstream schema, @checksum and @checksumType on TRelated are both
+               OPTIONAL (checksumType merely carries a default of SHA3-256; checksum has no
+               default and no use="required"). LOTAR requires checksums for archival (PD1), so
+               (2026-09-05, D-23: now P520_SCHEMA.xsd / P520_Related_Type / lotar-p520-archival.sch.)
+               P515_SCHEMA.xsd defines P515_Related_Type (xs:extension of TRelated) and a
+               companion Schematron layer (lotar-p515-archival.sch) enforces @checksum as
+               mandatory-for-archival on top of this loose base type — the same XSD-stays-
+               spec-faithful / Schematron-enforces-mandatory pattern used throughout the FMI2/
+               FMI3 archival profiles, since XSD restriction cannot tighten an inherited
+               attribute's `use` from optional to required within a single derivation step.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fmi-ls="http://fmi-standard.org/fmi-ls-manifest" elementFormDefault="qualified" attributeFormDefault="qualified">
+    <xs:import namespace="http://fmi-standard.org/fmi-ls-manifest" schemaLocation="fmi3LayeredStandardManifest.xsd"/>
+    <xs:include schemaLocation="fmi3Annotation.xsd"/>
+    <xs:annotation>
+        <xs:documentation>
+Copyright(c) 2023-2025 Modelica Association Project "FMI".
+             All rights reserved.
+
+This file is licensed by the copyright holders under the 2-Clause BSD License
+(https://opensource.org/licenses/BSD-2-Clause):
+
+----------------------------------------------------------------------------
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+- Redistributions of source code must retain the above copyright notice,
+ this list of conditions and the following disclaimer.
+
+- Redistributions in binary form must reproduce the above copyright notice,
+ this list of conditions and the following disclaimer in the documentation
+ and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+----------------------------------------------------------------------------
+        </xs:documentation>
+    </xs:annotation>
+    <xs:element name="fmiReferences">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Related" minOccurs="0" maxOccurs="unbounded" type="TRelated"/>
+                <xs:element ref="Annotations" minOccurs="0"/>
+            </xs:sequence>
+            <xs:attribute ref="fmi-ls:fmi-ls-name" use="required" fixed="org.fmi-standard.fmi-ls-ref"/>
+            <xs:attribute ref="fmi-ls:fmi-ls-version" use="required"/>
+            <xs:attribute ref="fmi-ls:fmi-ls-description" use="required" fixed="Layered Standard providing information on related files included in an FMU."/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="TRelated">
+        <xs:sequence>
+            <xs:element name="Label" minOccurs="0" maxOccurs="unbounded" type="TLabel"/>
+            <xs:element ref="Annotations" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="type" type="xs:string" use="optional" default="application/octet-stream">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">
+                    This attribute specifies the MIME type of the related resource, which
+                    defaults to application/octet-stream to indicate arbitrary binary data.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="source" type="xs:anyURI" use="required">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">
+                    This attribute indicates the source of the related resource as a URI
+                    (cf. RFC 3986).  For purposes of the resolution of relative URIs
+                    the base URI is the URI of the fmiReference file.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="role" use="required">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">
+                    This attribute specifies the role of the related resource.
+                </xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:pattern value="(document|requirement|specification|model|parameter|system|testcase|experiment(/(smoke-test|validation|uncertainty-analysis))?|result|method|rationale|report|request|delivery|configuration|signature|serialized-state(/.*)?|meta-data|other)"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="description" type="xs:string"/>
+        <xs:attribute name="checksum" type="xs:hexBinary">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">
+                    This optional attribute provides a hex-encoded digest of the resource
+                    referenced by source, allowing a consumer to verify that the resource
+                    has not been modified since the manifest was produced, to detect
+                    accidental changes or misidentification. The digest is calculated using
+                    the algorithm indicated by the checksumType attribute.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="checksumType" default="SHA3-256">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">
+                    This optional attribute gives the algorithm for the calculation of the
+                    `checksum` attribute. It defaults to SHA3-256 if this attribute is omitted.
+                    MUST be one of SHA3-224, SHA3-256, SHA3-384, SHA3-512 (as specified in FIPS
+                    202), or - for legacy reasons - one of SHA-224, SHA-256, SHA-384, SHA-512
+                    (as specified in FIPS 180-4, SHA-2 family).
+
+                    In future other digest algorithms might be supported.
+                </xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="SHA3-224"/>
+                    <xs:enumeration value="SHA3-256"/>
+                    <xs:enumeration value="SHA3-384"/>
+                    <xs:enumeration value="SHA3-512"/>
+                    <xs:enumeration value="SHA-224"/>
+                    <xs:enumeration value="SHA-256"/>
+                    <xs:enumeration value="SHA-384"/>
+                    <xs:enumeration value="SHA-512"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="TLabel">
+        <xs:attribute name="name" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">
+                    This attribute specifies the name of the label used to categorize or filter the related resource.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="description" type="xs:string">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">
+                    This optional attribute provides a brief description of the label.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+</xs:schema>

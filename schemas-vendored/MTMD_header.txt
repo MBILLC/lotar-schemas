@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Source: https://github.com/modelica/ssp-ls-traceability, branch feat/CMP (NOT main – main does
+    not contain MTMD.xsd at all, confirmed 2026-07-24).
+    Retrieved 2026-08-04 (Phase C, T-08a) at feat/CMP's tip, commit 1a5908e2d7175b2637a4af1e889dabd0ec34a6ab
+    (2026-08-04, "Merge branch 'feat/CMP' into Hans-Martin-Heinkel-patch-1").
+
+    PRE-MERGE / UNRELEASED: this branch has no PR-review gate, no branch protection, and no release
+    tag attached to it – a stronger caveat than a typical open PR (it isn't even a PR against main;
+    the related PR #84, commit dabd5e2, 2024-05-22, is an older, British-spelling
+    "ModellingTaskMetaData" variant, now stale relative to feat/CMP). Per D-6/Sec 1c of
+    LOTAR_Risk_Profile_Process_Plan_2026-07-24.md: user's direct information is that MTMD.xsd is
+    already in use by several organizations and considered stable despite being unmerged – treat as
+    a de facto stable draft, not a speculative feature branch, but RE-SYNC BEFORE USE if enough time
+    passes, since no release tag exists to pin against.
+
+    Provenance correction (2026-08-04, found while vendoring): this plan had previously cited commit
+    46a35ea (2024-12-10); feat/CMP's tip had moved to 1a5908e by the time of this vendoring. Content
+    diff between the two is cosmetic (task-name rewording in doc strings, plus a scoping caveat added
+    to ImplementParameter's documentation) – no obligation-matrix cells change as a result. See T-06a
+    and Sec 1c's MTMD-maturity note for detail.
+
+    Defines the LOTAR-profiled ModelingTaskMetaData (MTMD) schema – the Credible Modelling Process
+    (CMP) record, structurally the CSP (STMD) minus Execution/Evaluation. 5 phases / 24 steps.
+    Confirmed by T-06a (programmatic diff against STMD.xsd) that 22 of 24 steps share an exact or
+    task-name-substituted-identical STMD counterpart; the other 2 (AnalyzeModelingTaskAndObjectives,
+    DecideModelingObjectiveFulfillment) are the same concept under the task-type-specific name.
+
+    KNOWN DEFECTS, found while vendoring (T-08a), reportable upstream via T-21:
+    (1) Three top-level attribute documentation strings are STMD copy-paste leftovers, confirmed
+        still present at this commit: "Version of STMD format" (should say MTMD), "selecting
+        individual variant STMDs" (should say MTMDs), "GUID identifier of this STMD file" (should
+        say MTMD file) – see the "version"/"name"/"GUID" attributes at the end of this file.
+    (2) The typo "designi specification" (should be "design specification") appears in
+        DefineSimulationEnvironmentDesignSpecification's documentation – also present verbatim in
+        STMD.xsd, confirming both are copy-derived from a common source rather than independently
+        authored (T-06a finding).
+    Neither defect affects schema validity or LOTAR's obligation matrix – both are documentation-only.
+-->

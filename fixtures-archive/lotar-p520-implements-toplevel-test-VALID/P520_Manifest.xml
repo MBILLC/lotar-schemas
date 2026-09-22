@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Layer-2 directory fixture (2026-08-06, D-21/D-21b): P520_Manifest.xml, its governing DTMD, and
+  the SSP/FMU package it describes as three siblings inside one per-model folder, the decided
+  layout from P520_Risk_Profile_Normative_Clause.md Sec 5.7. SomeModel.ssp/ here is a placeholder
+  (its own internal layout is exercised by the separate lotar-stmd-dtmd-toplevel-test-* fixtures,
+  not repeated here) so this fixture stays focused on the Implements/Link resolution alone.
+
+  Scope note (2026-09-05, D-23): this skeletal manifest is read ONLY by the layer-2 resolver
+  (lotar_uri_resolve_check.py) for Implements/Link. It is not XSD-valid and is never run against
+  lotar-p520-archival.sch, so its evidence-less scenario (no TestCase/Validated_by/Verified_by,
+  P520-ARCH-003) is intentional, not an omission. The scenario element was renamed from the
+  typo'd Verification_Validation_Scenari on 2026-09-05.
+-->
+<p520:P520_Manifest xmlns:p520="http://www.lotar.org/schemas/mbse/p520#"
+                     xmlns:p500="http://www.lotar.org/schemas/mbse/p500#">
+  <p520:Verification_Validation>
+    <p520:Verification_Validation_Scenario>
+      <p520:Id>VV-1</p520:Id>
+      <p520:Verification_Credibility_Level>CL3</p520:Verification_Credibility_Level>
+      <p520:Validation_Credibility_Level>CL3</p520:Validation_Credibility_Level>
+      <p520:Implements>
+        <p500:Link>DecisionTask.dtmd</p500:Link>
+        <p500:Name>implements</p500:Name>
+      </p520:Implements>
+    </p520:Verification_Validation_Scenario>
+  </p520:Verification_Validation>
+</p520:P520_Manifest>

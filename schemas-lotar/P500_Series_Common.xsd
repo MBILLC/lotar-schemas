@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+	vc:minVersion="1.1"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	xmlns="http://www.lotar.org/schemas/mbse/p500#"
+	xmlns:tns="http://www.lotar.org/schemas/mbse/p500#"
+	targetNamespace="http://www.lotar.org/schemas/mbse/p500#"
+	>
+
+	<xs:annotation>
+		<xs:documentation>
+			Common types shared across the NAS9300 5xx-series MBSE manifest schemas
+			(P510, P515, P520, P550, ...). P500 is the parent namespace for the whole series:
+			this schema is not owned by any single part, so every part-specific schema
+			(P510, P515, P520, P550) imports it under the same p500: prefix rather than one of
+			them owning the namespace and the others importing from it, following the same
+			pattern used for the common Traceability types in the SSP-based LOTAR schemas.
+
+			Only GeneralPLMInfoType and ContentTypeType are shared with P550 today, since P550
+			defines its own distinct link/traceability model (Model_Links, Traceability_Link,
+			Metadata_Link, Link_Type). Traceability_Link_Type and LinkTypeInterpretation are
+			shared by P510 and P520 (and, until its integration into P520 on 2026-09-05, D-23, P515).
+		</xs:documentation>
+	</xs:annotation>
+
+	<!--START Shared with P510-->
+	<xs:complexType name="GeneralPLMInfoType">
+		<xs:annotation>
+			<xs:documentation> Metadata for PLM, including identifiers, creation/modification dates,
+				and organizational details. </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Unique_object_id" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Unique identifier for the object. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Unique_baseline_id" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Unique identifier for the baseline; optional. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Version_identifier" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Identifier representing the version of the object. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Model_Name" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Name of the model associated with the PLM object. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Created_on" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation> Date and time when the object was created. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Last_Modified_Date" type="xs:dateTime" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Date and time of the last modification; optional. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Created_by" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Name of the creator of the object; optional. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Maturity_State" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Indicates the maturity state of the object; optional. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Author_Organization" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Name of the organization that authored the object; optional. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Approver" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Name of the approver; optional. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Approval_State" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Approval state of the object; optional. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Authorization" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Authorization of the object; optional. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Usage" type="xs:string" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Uses of the requirements model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Copyright" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation> Intellectual property rights of the requirements model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="License" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation> License of the requirements model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Export_Controls" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation> Export information. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Model_Purpose" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Intention or business driver of the requirements model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Model_Objective" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Objective of the requirements model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="System_Designation" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> FIXME the requirements model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Model_Dependency" type="xs:anyURI" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Dependencies of the requirements model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Model_Hierarchy" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation> Hierarchy of the requirements model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Abstraction_Level" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Category of the requirements model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Privacy_Rules" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation> Rules to protect the access to the requirements model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Organization" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Organization that owns the requirements model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Export_control_marking" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Export markings of the requirements model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Special_markings" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Other markings of the requirements model. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Specification_Type_Objectives" type="xs:string" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> FIXME. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Traceability_Link_Type">
+		<xs:sequence>
+			<xs:element name="Type" type="LinkTypeInterpretation" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Interpretation of the link type (local or global). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Link" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation> URI of the linked resource. Target path in the referencing part. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ContentType" type="ContentTypeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Type of content being linked. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Name" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Name of the relationship. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Description" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Description of the linked resource. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Timestamp_Archiving" type="xs:dateTime" minOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Date and time when the link was archived. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Timestamp_PLM" type="xs:dateTime" minOccurs="1">
+				<xs:annotation>
+					<xs:documentation> Date and time when the link was created in the PLM system. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="LinkTypeInterpretation">
+		<xs:annotation>
+			<xs:documentation> The link is internal to the document or external. </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Local"/>
+			<xs:enumeration value="Global"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="ContentTypeType">
+		<xs:annotation>
+			<xs:documentation> The type of content in the target link. </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Requirement Model"/>
+			<xs:enumeration value="Logical Model"/>
+			<xs:enumeration value="Physical Model"/>
+			<xs:enumeration value="Behavioral Model"/>
+			<xs:enumeration value="Test Plan"/>
+			<xs:enumeration value="Test Case"/>
+			<xs:enumeration value="Document"/>
+			<xs:enumeration value="Variability Model"/>
+			<xs:enumeration value="Change Request"/>
+			<xs:enumeration value="Issue"/>
+			<xs:enumeration value="Evidence"/>
+			<xs:enumeration value="KPI"/>
+			<xs:enumeration value="Other"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--END Shared with P510-->
+
+</xs:schema>

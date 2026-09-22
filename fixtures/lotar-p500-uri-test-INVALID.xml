@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Dedicated URI-restriction test fixture (2026-07-22) for lotar-p500-uri.sch. Each violation is
+  isolated to exercise exactly one lettered assertion:
+
+    - Link = "/abs/reports/summary.pdf"           -> P500-ARCH-001a (absolute path)
+    - Copyright = "C:\rights\copyright.txt"        -> P500-ARCH-010a (backslash)
+                                                       [ALSO trips 010b, since "C:\" is also a
+                                                       drive-letter-absolute prefix — documents
+                                                       that Windows paths naturally trip both]
+    - License = "file:///C:/licenses/mine.txt"      -> P500-ARCH-010c (file: scheme)
+    - Export_Controls = "C:/export/none.txt"        -> P500-ARCH-010b (drive-letter-absolute,
+                                                       forward-slash form, isolated from 010a)
+    - Model_Dependency/Model_Hierarchy/Privacy_Rules left as valid urn: values (not every field
+      needs its own violation — the union context in P500-ARCH-010 already proves the rule
+      applies uniformly across all six elements via the three violations above).
+-->
+<TestFixture xmlns:p500="http://www.lotar.org/schemas/mbse/p500#">
+  <p500:Link>/abs/reports/summary.pdf</p500:Link>
+  <p500:Copyright>C:\rights\copyright.txt</p500:Copyright>
+  <p500:License>file:///C:/licenses/mine.txt</p500:License>
+  <p500:Export_Controls>C:/export/none.txt</p500:Export_Controls>
+  <p500:Model_Dependency>urn:dep:none</p500:Model_Dependency>
+  <p500:Model_Hierarchy>urn:hierarchy:top</p500:Model_Hierarchy>
+  <p500:Privacy_Rules>urn:privacy:none</p500:Privacy_Rules>
+</TestFixture>

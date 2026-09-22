@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Dedicated test fixture (2026-08-06, D-21/D-21b) for lotar-p520-uri.sch's P520-ARCH-002
+  (Verification_Validation_Scenario_Type/Implements — links the Model Report to the governing
+  CDP/DTMD record). Synthetic Schematron-only fixture using a lightweight wrapper limited to the
+  element this rule targets, same convention as lotar-p520-uri-test-VALID.xml.
+
+  Link="DecisionTask.dtmd" is a bare filename (no path separator) ending in .dtmd, exactly
+  D-21b's "direct sibling of P520_Manifest.xml" requirement. Name="implements" matches D-21's
+  normative relation label exactly.
+-->
+<TestFixture xmlns:p520="http://www.lotar.org/schemas/mbse/p520#"
+             xmlns:p500="http://www.lotar.org/schemas/mbse/p500#">
+  <p520:Implements>
+    <p500:Link>DecisionTask.dtmd</p500:Link>
+    <p500:Name>implements</p500:Name>
+  </p520:Implements>
+</TestFixture>

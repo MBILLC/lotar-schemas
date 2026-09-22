@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    LOTAR Core vocabulary for SRMD — Part 2: P520 (Simulation Model Manifest).
+    See LOTAR_Core_P520_Vocabulary.md for the full attribute table and design notes, and
+    LOTAR_Core_Common_Vocabulary.md / SRMDLOTARCore_Common.xsd for the shared administrative/legal
+    part carried alongside this one under a separate Classification/@type.
+
+    Modeled on SRMDMICCore.xsd / SRMDSICCore.xsd: this file defines no new elements itself. It
+    xs:includes the base SRMD structural schema (SRMD.xsd, already in this project) and adds
+    Schematron rules that constrain the generic SRMD Classification/ClassificationEntry
+    key-value-pair model to the fixed keyword set proposed under
+    Classification[@type='org.lotar-international.lotar-core.p520'].
+
+    Scope: P520 development/build environment, integration process, physics content and usage,
+    model variables, and (since D-23) behavioral-model test-case / reference-result content not already covered by MIC Core (see
+    P515_P520_vs_MIC_Core_Gap.md). Deliberately excludes
+    Verification_Validation_Scenario_Type.Validated_by/Verified_by (type Traceability_Link_Type)
+    since inter-model/inter-artifact linking is deferred to a future P550 standard. The rest of
+    Verification_Validation_Scenario_Type (Id, credibility levels, Model_Summary_Report) is
+    already covered by MIC Core, so it is not repeated here. SIC Core was not consulted for this
+    vocabulary per direction.
+
+    This is a first-draft proposal: unlike SRMDMICCore.xsd / SRMDSICCore.xsd it does not yet
+    include Schematron Quick Fixes (sqf:) for auto-remediation — flagged here as follow-up work
+    once the vocabulary itself is reviewed and stable.
+
+    2026-07-21 (D10 closure, domain-specific): added effectivity.applicability, Recommended — closes
+    D10 (Effectivity) for P520 specifically, per direction that effectivity be handled
+    domain-specifically (in each of P515 Core — retired 2026-09-05, D-23 — and P520 Core) rather than in the shared Common
+    vocabulary. Same keyword name as P515 Core's own addition, but a separate field under this
+    file's own Classification/@type — each domain part owns its own instance rather than sharing
+    one Common-level definition. Recommended tier matches D10's own SHOULD strength; see
+    LOTAR_Core_P520_Vocabulary.md for the full rationale.
+
+    2026-09-05 (D-23, P515 integration) — REVISION:
+      (a) The 15 test-case / reference-result keywords (test-case.*) formerly enforced by
+          SRMDLOTARCore_P515.xsd under Classification[@type='org.lotar-international.lotar-core.p515']
+          are now enforced here under this file's own @type: 12 Mandatory, 3 Optional; repeatable:
+          test-case.context.relative-path, test-case.scenario.property-modification,
+          test-case.scenario.boundary-constant, test-case.reference.variable. SRMDLOTARCore_P515.xsd
+          is retired to deprecated/ (its own copy of the anti-pattern below is left as written).
+      (b) BUGS FIXED while the file was open — this file's embedded rules had never been compiled:
+          sch:let variables inside rule context= (unsupported by lxml/libxslt: every context= now
+          carries the literal @type string, as SRMDLOTARCore_Common.xsd already does), XPath 2.0
+          sequence syntax "@keyword=('a','b')" and matches() under this project's
+          queryBinding="xslt"/XPath 1.0 convention (rewritten with the '|'-delimited contains()
+          idiom and explicit or-tests). Verified 2026-09-05 by extracting the embedded patterns
+          into a standalone ISO Schematron and compiling them with lxml.isoschematron against a
+          hand-built SRMD instance (see the decisions log entry).
+
+    2026-08-06 (D-21): P520_SCHEMA.xsd's Verification_Validation_Scenario_Type gained a new native
+    element, Implements (Traceability_Link_Type), linking a scenario's Model Report to its governing
+    CDP/DTMD record. Same treatment as Validated_by/Verified_by above — it is a native
+    Traceability_Link_Type field, not an SRMD Classification keyword, so it is NOT added here
+    either; this note exists only so a future reader doesn't mistake it for something this file's
+    "already covered by MIC Core" line above (line 19) was ever meant to include — that line
+    predates D-21 by two weeks and never considered it. See P520_Risk_Profile_Normative_Clause.md
+    for the normative rule and LOTAR_Risk_Profile_Process_Plan_2026-07-24.md's D-21 entry for the
+    full rationale.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+    xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" vc:minVersion="1.1"
+    xmlns:srmd="http://ssp-standard.org/SSPTraceability1/SimulationResourceMetaData"
+    xmlns:stc="http://ssp-standard.org/SSPTraceability1/SSPTraceabilityCommon"
+    xmlns:ssc="http://ssp-standard.org/SSP1/SystemStructureCommon"
+    xmlns:sch="http://purl.oclc.org/dsdl/schematron"
+    targetNamespace="http://ssp-standard.org/SSPTraceability1/SimulationResourceMetaData">
+
+    <xs:include schemaLocation="../schemas-vendored/SRMD.xsd"/>
+
+    <xs:annotation>
+        <xs:appinfo>
+            <sch:title>LOTAR Core (P520) Classification Checks</sch:title>
+            <sch:ns uri="http://ssp-standard.org/SSPTraceability1/SimulationResourceMetaData" prefix="srmd"/>
+            <sch:ns uri="http://ssp-standard.org/SSPTraceability1/SSPTraceabilityCommon" prefix="stc"/>
+
+            <sch:pattern>
+                <sch:title>LOTAR Core P520: Classification Presence</sch:title>
+                <sch:let name="lotar-core-p520-type" value="'org.lotar-international.lotar-core.p520'"/>
+                <sch:rule context="/srmd:SimulationResourceMetaData" role="info">
+                    <sch:assert test="count(stc:Classification[@type='org.lotar-international.lotar-core.p520'])&lt;=1">
+                        More than one LOTAR Core (P520) classification.
+                    </sch:assert>
+                </sch:rule>
+            </sch:pattern>
+
+            <sch:pattern>
+                <sch:title>LOTAR Core P520: Mandatory Attributes</sch:title>
+                <sch:rule context="/srmd:SimulationResourceMetaData/stc:Classification[@type='org.lotar-international.lotar-core.p520']">
+                    <sch:assert test="stc:ClassificationEntry[@keyword='environment.dev-tool.name']">Missing mandatory Dev Tool Name attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='environment.dev-tool.version']">Missing mandatory Dev Tool Version attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='environment.dev-tool.license']">Missing mandatory Dev Tool License attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='environment.dev-os.name']">Missing mandatory Dev OS Name attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='environment.dev-os.version']">Missing mandatory Dev OS Version attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='environment.dev-os.license']">Missing mandatory Dev OS License attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='environment.dev-os.compiler.name']">Missing mandatory Dev OS Compiler Name attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='environment.dev-os.compiler.version']">Missing mandatory Dev OS Compiler Version attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='environment.cpu-number']">Missing mandatory CPU Number attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='environment.ram-size']">Missing mandatory RAM Size attribute.</sch:assert>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='integration.model-type']">Missing mandatory Model Type attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='integration.libraries-dependencies']">Missing mandatory Libraries Dependencies attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='integration.solver-dependencies']">Missing mandatory Solver Dependencies attribute.</sch:assert>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='physics.fidelity.represented-phenomena']">Missing mandatory Fidelity Represented Phenomena attribute.</sch:assert>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='variables.key-inputs']">Missing mandatory Key Input attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='variables.key-outputs']">Missing mandatory Key Output attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='variables.key-parameters']">Missing mandatory Key Parameter attribute.</sch:assert>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='test-case.context.number']">Missing mandatory Test Case Context Number attribute (test case, D-23).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='test-case.experiment.algorithm']">Missing mandatory Experiment Algorithm attribute (test case, D-23).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='test-case.experiment.communication-points']">Missing mandatory Experiment Communication Points attribute (test case, D-23).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='test-case.experiment.start-time']">Missing mandatory Experiment Start Time attribute (test case, D-23).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='test-case.experiment.stop-time']">Missing mandatory Experiment Stop Time attribute (test case, D-23).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='test-case.experiment.tolerance']">Missing mandatory Experiment Tolerance attribute (test case, D-23).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='test-case.reference.variable']">Missing mandatory Reference Variable attribute (test case, D-23).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='test-case.reference.tolerance.absolute-x']">Missing mandatory Reference Tolerance Absolute X attribute (test case, D-23).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='test-case.reference.tolerance.absolute-y']">Missing mandatory Reference Tolerance Absolute Y attribute (test case, D-23).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='test-case.reference.tolerance.relative-x']">Missing mandatory Reference Tolerance Relative X attribute (test case, D-23).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='test-case.reference.tolerance.relative-y']">Missing mandatory Reference Tolerance Relative Y attribute (test case, D-23).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='test-case.reference.file-hash']">Missing mandatory Reference File Hash attribute (test case, D-23).</sch:assert>
+                </sch:rule>
+            </sch:pattern>
+
+            <sch:pattern>
+                <sch:title>LOTAR Core P520: Recommended (Optional) Attributes</sch:title>
+                <sch:rule context="/srmd:SimulationResourceMetaData/stc:Classification[@type='org.lotar-international.lotar-core.p520']" role="info">
+                    <sch:assert test="stc:ClassificationEntry[@keyword='environment.dev-os.compiler.license']">Missing optional Dev OS Compiler License attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='environment.dev-language']">Missing optional Dev Language attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='environment.target-tool-name']">Missing optional Target Tool Name attribute.</sch:assert>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='integration.coupling-mode']">Missing optional Coupling Mode attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='integration.communication-mode']">Missing optional Communication Mode attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='integration.model-format']">Missing optional Model Format attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='integration.real-time']">Missing optional Real Time attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='integration.parallelization']">Missing optional Parallelization attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='integration.os-functions-dependencies']">Missing optional OS Functions Dependencies attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='integration.link-resources']">Missing optional Link Resources attribute.</sch:assert>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='physics.dimension']">Missing optional Dimension attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='physics.time-scale']">Missing optional Time Scale attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='physics.linearity']">Missing optional Linearity attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='physics.model-type-usage']">Missing optional Model Type Usage attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='physics.environment']">Missing optional Environment attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='physics.fidelity.neglected-phenomena']">Missing optional Fidelity Neglected Phenomena attribute.</sch:assert>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='variables.signal-dictionary']">Missing optional Signal Dictionary attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='variables.other-variables']">Missing optional Other Variable attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='test-case.context.relative-path']">Missing optional Test Case Context Relative Path attribute (test case, D-23).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='test-case.scenario.property-modification']">Missing optional Scenario Property Modification attribute (test case, D-23).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='test-case.scenario.boundary-constant']">Missing optional Scenario Boundary Constant attribute (test case, D-23).</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='effectivity.applicability']">Missing optional Effectivity Applicability attribute (D10) — date range, event, serial numbers, or batch numbers this model manifest is applicable to, where relevant.</sch:assert>
+                </sch:rule>
+            </sch:pattern>
+
+            <sch:pattern>
+                <sch:title>LOTAR Core P520: Attribute Rules</sch:title>
+                <!-- Repeatable keywords are inlined literally into the rule context below (sch:let is not usable in context=): variables.key-inputs/key-outputs/key-parameters/other-variables, integration.libraries-dependencies/os-functions-dependencies/solver-dependencies/link-resources, test-case.context.relative-path, test-case.scenario.property-modification, test-case.scenario.boundary-constant, test-case.reference.variable. -->
+                <sch:rule context="/srmd:SimulationResourceMetaData/stc:Classification[@type='org.lotar-international.lotar-core.p520']/stc:ClassificationEntry[not(contains('|variables.key-inputs|variables.key-outputs|variables.key-parameters|variables.other-variables|integration.libraries-dependencies|integration.os-functions-dependencies|integration.solver-dependencies|integration.link-resources|test-case.context.relative-path|test-case.scenario.property-modification|test-case.scenario.boundary-constant|test-case.reference.variable|', concat('|', @keyword, '|')))]">
+                    <sch:assert test="count(preceding-sibling::stc:ClassificationEntry[@keyword=current()/@keyword]) = 0">
+                        The attribute '<sch:value-of select="@keyword"/>' occurred more than once (this keyword is not defined as repeatable).
+                    </sch:assert>
+                </sch:rule>
+
+            </sch:pattern>
+            <sch:pattern>
+                <sch:title>LOTAR Core P520: Boolean-valued Keywords</sch:title>
+                <!-- Own pattern for the same first-matching-rule reason as the Allowed Keywords pattern below. -->
+                <sch:rule context="/srmd:SimulationResourceMetaData/stc:Classification[@type='org.lotar-international.lotar-core.p520']/stc:ClassificationEntry[@keyword='physics.time-scale' or @keyword='physics.linearity' or @keyword='integration.real-time' or @keyword='integration.parallelization']" role="warn">
+                    <sch:assert test=". = 'true' or . = 'false'">
+                        Value '<sch:value-of select="."/>' for '<sch:value-of select="@keyword"/>' should be the literal 'true' or 'false' (source schema type is xs:boolean).
+                    </sch:assert>
+                </sch:rule>
+            </sch:pattern>
+            <sch:pattern>
+                <sch:title>LOTAR Core P520: Allowed Keywords</sch:title>
+                <!-- Own pattern (fixed 2026-09-05, D-23 revision): ISO Schematron fires only the
+                     first matching rule per pattern for a given node, so this rule never fired
+                     while it shared a pattern with the non-repeatable-duplicate rule above, whose
+                     context matches the same ClassificationEntry nodes. Same trap recorded in the
+                     Schematron tooling notes. -->
+                <sch:let name="allowed-keywords" value="'|environment.dev-tool.name|environment.dev-tool.version|environment.dev-tool.license|environment.dev-os.name|environment.dev-os.version|environment.dev-os.license|environment.dev-os.compiler.name|environment.dev-os.compiler.version|environment.dev-os.compiler.license|environment.dev-language|environment.cpu-number|environment.ram-size|environment.target-tool-name|integration.coupling-mode|integration.communication-mode|integration.model-format|integration.real-time|integration.parallelization|integration.model-type|integration.libraries-dependencies|integration.os-functions-dependencies|integration.solver-dependencies|integration.link-resources|physics.dimension|physics.time-scale|physics.linearity|physics.model-type-usage|physics.environment|physics.fidelity.represented-phenomena|physics.fidelity.neglected-phenomena|variables.key-inputs|variables.key-outputs|variables.key-parameters|variables.signal-dictionary|variables.other-variables|effectivity.applicability|test-case.context.number|test-case.context.relative-path|test-case.experiment.algorithm|test-case.experiment.communication-points|test-case.experiment.start-time|test-case.experiment.stop-time|test-case.experiment.tolerance|test-case.scenario.property-modification|test-case.scenario.boundary-constant|test-case.reference.variable|test-case.reference.tolerance.absolute-x|test-case.reference.tolerance.absolute-y|test-case.reference.tolerance.relative-x|test-case.reference.tolerance.relative-y|test-case.reference.file-hash|'"/>
+                <sch:rule context="/srmd:SimulationResourceMetaData/stc:Classification[@type='org.lotar-international.lotar-core.p520']/stc:ClassificationEntry">
+                    <sch:assert test="contains($allowed-keywords, concat('|', @keyword, '|'))">
+                        Unknown LOTAR Core (P520) classification attribute '<sch:value-of select="@keyword"/>'.
+                    </sch:assert>
+                </sch:rule>
+            </sch:pattern>
+        </xs:appinfo>
+    </xs:annotation>
+
+</xs:schema>

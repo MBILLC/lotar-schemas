@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    STATUS (reversed 2026-08-04, T-24, LOTAR_Risk_Profile_Process_Plan_2026-07-24.md Phase G):
+    moved out of WaitForLater/ into the project root, matching SRMDMICCore.xsd's convention. The
+    2026-07-20 "disregarded for now" status is superseded: OD-16 (multi-Classification-block
+    architecture for combining MIC Core + SIC Core + LOTAR Core) is resolved (D-16, 2026-08-04) and
+    SIC Core is now in active scope for this project's risk-profile work (§3.4). A copy remains
+    under WaitForLater/ from before this move; this file at the project root is the one in active
+    use going forward.
+
+    Original 2026-07-20 status note, for history: "disregarded for the mandatory LOTAR Core
+    baseline for now. MIC Core + SRMDLOTARCore_Common.xsd/_P515.xsd/_P520.xsd are treated as
+    sufficient coverage."
+
+    Re-verification (2026-08-04, T-24, checked rather than assumed): `lxml.isoschematron.Schematron`
+    against this file at its new location fails with `XSLTApplyError: Cannot resolve URI
+    https://www.w3.org/XML/2008/06/xlink.xsd`, confirmed this is NOT a regression introduced by
+    the move: the sibling `SRMDMICCore.xsd` (untouched, same directory, same convention) fails with
+    the exact same error when checked the same way. Both files' embedded Schematron extraction
+    depends on resolving the W3C xlink schema over the network, which this environment does not
+    permit, a pre-existing, environment-specific limitation shared by every file in this project
+    that transitively imports the W3C xlink schema, not something specific to SIC Core or to this
+    move.
+
+    Source: https://raw.githubusercontent.com/MIC-Core/SIC-Core/main/schemas/SRMDSICCore.xsd
+    Referenced from: https://mic-core.github.io/SIC-Core/main/#_xml_srmd_schema_for_sic_core
+    (Appendix A, "XML SRMD-Schema for SIC Core", of the SIC Core Specification, retrieved 2026-07-17.)
+
+    SIC Core is a sibling specification to MIC Core (compare SRMDMICCore.xsd, saved alongside this
+    file): same producing organization and same SRMD/Classification/ClassificationEntry mechanism,
+    but a much larger, phase-structured attribute set (Administrative Data, Analysis, Requirements,
+    Design, Implementation, Execution, Evaluation, Fulfillment) with per-attribute Obligation levels
+    (Mandatory/Recommended/Optional) and composite attributes with dotted sub-attribute keywords
+    (e.g. "administrative.simulation-task", "administrative.simulation-task.name"). Like
+    SRMDMICCore.xsd, this file defines no new elements itself: it xs:includes the base SRMD
+    structural schema and adds Schematron rules constraining Classification/ClassificationEntry
+    under Classification[@type='org.mic-core.sic-core'] to this fixed keyword set.
+
+    Dependency chain: SRMDSICCore.xsd includes SRMD.xsd, which imports STC.xsd (SSPTraceabilityCommon)
+    and (unresolved) SystemStructureCommon.xsd. The upstream include target for SRMD.xsd has moved
+    to the official Modelica Association project at
+    https://modelica.github.io/ssp-ls-traceability/main/SRMD.xsd (successor location to the
+    pmsfit/SSPTraceability repo used for the MIC Core baseline) but its content, and that of the
+    STC.xsd it in turn imports, was verified byte-identical to the SRMD.xsd / STC.xsd already saved
+    in this project for the MIC Core baseline, so those two files are reused here rather than
+    duplicated. See SRMDMICCore.xsd for the rationale on leaving SystemStructureCommon.xsd and the
+    W3C xlink schema unresolved.
+
+    DEVIATION FROM SOURCE: the original xs:include below points to the absolute URL
+    "https://modelica.github.io/ssp-ls-traceability/main/SRMD.xsd". It has been changed here to the
+    relative "SRMD.xsd" so this file resolves against the local SRMD.xsd/STC.xsd bundle without a
+    network fetch, consistent with SRMDMICCore.xsd. No other content was changed.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+    xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" vc:minVersion="1.1"
+    xmlns:srmd="http://ssp-standard.org/SSPTraceability1/SimulationResourceMetaData"
+    xmlns:stc="http://ssp-standard.org/SSPTraceability1/SSPTraceabilityCommon"
+    xmlns:ssc="http://ssp-standard.org/SSP1/SystemStructureCommon"
+    xmlns:sch="http://purl.oclc.org/dsdl/schematron"
+    xmlns:sqf="http://www.schematron-quickfix.com/validator/process"
+    targetNamespace="http://ssp-standard.org/SSPTraceability1/SimulationResourceMetaData">
+
+    <xs:include schemaLocation="SRMD.xsd"/>
+
+    <xs:annotation>
+        <xs:appinfo>
+            <sch:title>SIC Core Classification Checks</sch:title>
+            <sch:ns uri="http://ssp-standard.org/SSPTraceability1/SimulationResourceMetaData" prefix="srmd"/>
+            <sch:ns uri="http://ssp-standard.org/SSPTraceability1/SSPTraceabilityCommon" prefix="stc"/>
+
+            <sch:pattern>
+                <sch:title>SIC Core: Classification Presence</sch:title>
+                <sch:let name="sic-core-type" value="'org.mic-core.sic-core'"/>
+                <sch:rule context="/srmd:SimulationResourceMetaData" role="info">
+                    <sch:assert test="count(stc:Classification[@type=$sic-core-type])=1">
+                        Missing or more than one SIC Core classification.
+                    </sch:assert>
+                </sch:rule>
+            </sch:pattern>
+            <sch:pattern>
+                <sch:title>SIC Core: Mandatory Attributes</sch:title>
+                <sch:rule context="/srmd:SimulationResourceMetaData/stc:Classification[@type=$sic-core-type]">
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.simulation-task'] or stc:ClassificationEntry[@keyword='administrative.simulation-task.name'] or stc:ClassificationEntry[@keyword='administrative.simulation-task.version'] or stc:ClassificationEntry[@keyword='administrative.simulation-task.identifier']" sqf:fix="add-administrative-simulation-task">Missing mandatory Simulation Task attribute.</sch:assert>
+                    <sqf:fix id="add-administrative-simulation-task"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="administrative.simulation-task">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+                    <sch:assert test="not(stc:ClassificationEntry[@keyword='administrative.simulation-task'] and (stc:ClassificationEntry[@keyword='administrative.simulation-task.name'] or stc:ClassificationEntry[@keyword='administrative.simulation-task.version'] or stc:ClassificationEntry[@keyword='administrative.simulation-task.identifier']))">Use either the Simulation Task base attribute or the mandatory Simulation Task sub-attributes, but not both.</sch:assert>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.simulation-task'] or stc:ClassificationEntry[@keyword='administrative.simulation-task.name']" sqf:fix="add-administrative-simulation-task-name">Missing mandatory Simulation Task Name attribute.</sch:assert>
+                    <sqf:fix id="add-administrative-simulation-task-name"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="administrative.simulation-task.name">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.simulation-task'] or stc:ClassificationEntry[@keyword='administrative.simulation-task.version']" sqf:fix="add-administrative-simulation-task-version">Missing mandatory Simulation Task Version attribute.</sch:assert>
+                    <sqf:fix id="add-administrative-simulation-task-version"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="administrative.simulation-task.version">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.simulation-task'] or stc:ClassificationEntry[@keyword='administrative.simulation-task.identifier']" sqf:fix="add-administrative-simulation-task-identifier">Missing mandatory Simulation Task Identifier attribute.</sch:assert>
+                    <sqf:fix id="add-administrative-simulation-task-identifier"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="administrative.simulation-task.identifier">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='analysis.item-under-test'] or stc:ClassificationEntry[@keyword='analysis.item-under-test.name'] or stc:ClassificationEntry[@keyword='analysis.item-under-test.version'] or stc:ClassificationEntry[@keyword='analysis.item-under-test.identifier']" sqf:fix="add-analysis-item-under-test">Missing mandatory Item under Test attribute.</sch:assert>
+                    <sqf:fix id="add-analysis-item-under-test"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="analysis.item-under-test">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+                    <sch:assert test="not(stc:ClassificationEntry[@keyword='analysis.item-under-test'] and (stc:ClassificationEntry[@keyword='analysis.item-under-test.name'] or stc:ClassificationEntry[@keyword='analysis.item-under-test.version'] or stc:ClassificationEntry[@keyword='analysis.item-under-test.identifier']))">Use either the Item under Test base attribute or the mandatory Item under Test sub-attributes, but not both.</sch:assert>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='analysis.item-under-test'] or stc:ClassificationEntry[@keyword='analysis.item-under-test.name']" sqf:fix="add-analysis-item-under-test-name">Missing mandatory Item under Test Name attribute.</sch:assert>
+                    <sqf:fix id="add-analysis-item-under-test-name"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="analysis.item-under-test.name">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='analysis.item-under-test'] or stc:ClassificationEntry[@keyword='analysis.item-under-test.version']" sqf:fix="add-analysis-item-under-test-version">Missing mandatory Item under Test Version attribute.</sch:assert>
+                    <sqf:fix id="add-analysis-item-under-test-version"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="analysis.item-under-test.version">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='analysis.item-under-test'] or stc:ClassificationEntry[@keyword='analysis.item-under-test.identifier']" sqf:fix="add-analysis-item-under-test-identifier">Missing mandatory Item under Test Identifier attribute.</sch:assert>
+                    <sqf:fix id="add-analysis-item-under-test-identifier"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="analysis.item-under-test.identifier">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='analysis.simulation-task.objectives']" sqf:fix="add-analysis-simulation-task-objectives">Missing mandatory Simulation Objective attribute.</sch:assert>
+                    <sqf:fix id="add-analysis-simulation-task-objectives"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="analysis.simulation-task.objectives">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='requirements.parameter.subject-information.parametrized-entity']" sqf:fix="add-requirements-parameter-subject-information-parametrized-entity">Missing mandatory Entity Parameter attribute.</sch:assert>
+                    <sqf:fix id="add-requirements-parameter-subject-information-parametrized-entity"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="requirements.parameter.subject-information.parametrized-entity">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='execution.model'] or stc:ClassificationEntry[@keyword='execution.model.name'] or stc:ClassificationEntry[@keyword='execution.model.version'] or stc:ClassificationEntry[@keyword='execution.model.identifier']" sqf:fix="add-execution-model">Missing mandatory Used Simulation Model attribute.</sch:assert>
+                    <sqf:fix id="add-execution-model"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="execution.model">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+                    <sch:assert test="not(stc:ClassificationEntry[@keyword='execution.model'] and (stc:ClassificationEntry[@keyword='execution.model.name'] or stc:ClassificationEntry[@keyword='execution.model.version'] or stc:ClassificationEntry[@keyword='execution.model.identifier']))">Use either the Used Simulation Model base attribute or the mandatory Used Simulation Model sub-attributes, but not both.</sch:assert>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='execution.model'] or stc:ClassificationEntry[@keyword='execution.model.name']" sqf:fix="add-execution-model-name">Missing mandatory Used Simulation Model Name attribute.</sch:assert>
+                    <sqf:fix id="add-execution-model-name"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="execution.model.name">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='execution.model'] or stc:ClassificationEntry[@keyword='execution.model.version']" sqf:fix="add-execution-model-version">Missing mandatory Used Simulation Model Version attribute.</sch:assert>
+                    <sqf:fix id="add-execution-model-version"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="execution.model.version">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='execution.model'] or stc:ClassificationEntry[@keyword='execution.model.identifier']" sqf:fix="add-execution-model-identifier">Missing mandatory Used Simulation Model Identifier attribute.</sch:assert>
+                    <sqf:fix id="add-execution-model-identifier"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="execution.model.identifier">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='execution.parameter'] or stc:ClassificationEntry[@keyword='execution.parameter.name'] or stc:ClassificationEntry[@keyword='execution.parameter.version'] or stc:ClassificationEntry[@keyword='execution.parameter.identifier']" sqf:fix="add-execution-parameter">Missing mandatory Used Parameter attribute.</sch:assert>
+                    <sqf:fix id="add-execution-parameter"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="execution.parameter">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+                    <sch:assert test="not(stc:ClassificationEntry[@keyword='execution.parameter'] and (stc:ClassificationEntry[@keyword='execution.parameter.name'] or stc:ClassificationEntry[@keyword='execution.parameter.version'] or stc:ClassificationEntry[@keyword='execution.parameter.identifier']))">Use either the Used Parameter base attribute or the mandatory Used Parameter sub-attributes, but not both.</sch:assert>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='execution.parameter'] or stc:ClassificationEntry[@keyword='execution.parameter.name']" sqf:fix="add-execution-parameter-name">Missing mandatory Used Parameter Name attribute.</sch:assert>
+                    <sqf:fix id="add-execution-parameter-name"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="execution.parameter.name">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='execution.parameter'] or stc:ClassificationEntry[@keyword='execution.parameter.version']" sqf:fix="add-execution-parameter-version">Missing mandatory Used Parameter Version attribute.</sch:assert>
+                    <sqf:fix id="add-execution-parameter-version"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="execution.parameter.version">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='execution.parameter'] or stc:ClassificationEntry[@keyword='execution.parameter.identifier']" sqf:fix="add-execution-parameter-identifier">Missing mandatory Used Parameter Identifier attribute.</sch:assert>
+                    <sqf:fix id="add-execution-parameter-identifier"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="execution.parameter.identifier">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='execution.tool'] or stc:ClassificationEntry[@keyword='execution.tool.name'] or stc:ClassificationEntry[@keyword='execution.tool.version'] or stc:ClassificationEntry[@keyword='execution.tool.identifier']" sqf:fix="add-execution-tool">Missing mandatory Used Tool attribute.</sch:assert>
+                    <sqf:fix id="add-execution-tool"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="execution.tool">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+                    <sch:assert test="not(stc:ClassificationEntry[@keyword='execution.tool'] and (stc:ClassificationEntry[@keyword='execution.tool.name'] or stc:ClassificationEntry[@keyword='execution.tool.version'] or stc:ClassificationEntry[@keyword='execution.tool.identifier']))">Use either the Used Tool base attribute or the mandatory Used Tool sub-attributes, but not both.</sch:assert>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='execution.tool'] or stc:ClassificationEntry[@keyword='execution.tool.name']" sqf:fix="add-execution-tool-name">Missing mandatory Used Tool Name attribute.</sch:assert>
+                    <sqf:fix id="add-execution-tool-name"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="execution.tool.name">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='execution.tool'] or stc:ClassificationEntry[@keyword='execution.tool.version']" sqf:fix="add-execution-tool-version">Missing mandatory Used Tool Version attribute.</sch:assert>
+                    <sqf:fix id="add-execution-tool-version"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="execution.tool.version">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='execution.tool'] or stc:ClassificationEntry[@keyword='execution.tool.identifier']" sqf:fix="add-execution-tool-identifier">Missing mandatory Used Tool Identifier attribute.</sch:assert>
+                    <sqf:fix id="add-execution-tool-identifier"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="execution.tool.identifier">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+
+                    <sch:assert test="stc:ClassificationEntry[@keyword='fulfillment.task-status']" sqf:fix="add-fulfillment-task-status">Missing mandatory Task Status attribute.</sch:assert>
+                    <sqf:fix id="add-fulfillment-task-status"><sqf:description><sqf:title>Add missing classification entry</sqf:title></sqf:description><sqf:add position="last-child"><stc:ClassificationEntry keyword="fulfillment.task-status">Value</stc:ClassificationEntry></sqf:add></sqf:fix>
+                </sch:rule>
+            </sch:pattern>
+            <sch:pattern>
+                <sch:title>SIC Core: Recommended Attributes</sch:title>
+                <sch:rule context="/srmd:SimulationResourceMetaData/stc:Classification[@type=$sic-core-type]" role="info">
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.overall-product'] or stc:ClassificationEntry[starts-with(@keyword, 'administrative.overall-product.')]">Missing recommended Overall Product attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.overall-product'] or stc:ClassificationEntry[@keyword='administrative.overall-product.name']">Missing recommended Overall Product Name attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.overall-product'] or stc:ClassificationEntry[@keyword='administrative.overall-product.version']">Missing recommended Overall Product Version attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.overall-product'] or stc:ClassificationEntry[@keyword='administrative.overall-product.identifier']">Missing recommended Overall Product Identifier attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.specific-product'] or stc:ClassificationEntry[starts-with(@keyword, 'administrative.specific-product.')]">Missing recommended Specific Product attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.specific-product'] or stc:ClassificationEntry[@keyword='administrative.specific-product.name']">Missing recommended Specific Product Name attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.specific-product'] or stc:ClassificationEntry[@keyword='administrative.specific-product.version']">Missing recommended Specific Product Version attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.specific-product'] or stc:ClassificationEntry[@keyword='administrative.specific-product.identifier']">Missing recommended Specific Product Identifier attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.ordering-project'] or stc:ClassificationEntry[starts-with(@keyword, 'administrative.ordering-project.')]">Missing recommended Ordering Project attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.ordering-project'] or stc:ClassificationEntry[@keyword='administrative.ordering-project.name']">Missing recommended Ordering Project Name attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.ordering-project'] or stc:ClassificationEntry[@keyword='administrative.ordering-project.version']">Missing recommended Ordering Project Version attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.ordering-project'] or stc:ClassificationEntry[@keyword='administrative.ordering-project.identifier']">Missing recommended Ordering Project Identifier attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.simulation-request'] or stc:ClassificationEntry[starts-with(@keyword, 'administrative.simulation-request.')]">Missing recommended Simulation Request attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.simulation-request'] or stc:ClassificationEntry[@keyword='administrative.simulation-request.name']">Missing recommended Simulation Request Name attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.simulation-request'] or stc:ClassificationEntry[@keyword='administrative.simulation-request.version']">Missing recommended Simulation Request Version attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.simulation-request'] or stc:ClassificationEntry[@keyword='administrative.simulation-request.identifier']">Missing recommended Simulation Request Identifier attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.simulation-task'] or stc:ClassificationEntry[@keyword='administrative.simulation-task.confidentiality']">Missing recommended Simulation Task Confidentiality Level attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.simulation-task'] or stc:ClassificationEntry[@keyword='administrative.simulation-task.date.start']">Missing recommended Predicted Simulation Start Date attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.simulation-task'] or stc:ClassificationEntry[@keyword='administrative.simulation-task.date.delivery']">Missing recommended Requested Simulation Delivery Date attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.contact.customer-person']">Missing recommended Requesting Person attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.contact.customer-entity']">Missing recommended Requesting Entity attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.contact.contractor-person']">Missing recommended Contracting Person attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='administrative.contact.contractor-entity']">Missing recommended Contracting Entity attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='analysis.engineering-task.higher-level'] or stc:ClassificationEntry[starts-with(@keyword, 'analysis.engineering-task.higher-level.')]">Missing recommended Higher Level Engineering Task attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='analysis.engineering-task.higher-level'] or stc:ClassificationEntry[@keyword='analysis.engineering-task.higher-level.name']">Missing recommended Higher Level Engineering Task Name attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='analysis.engineering-task.higher-level'] or stc:ClassificationEntry[@keyword='analysis.engineering-task.higher-level.version']">Missing recommended Higher Level Engineering Task Version attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='analysis.engineering-task.higher-level'] or stc:ClassificationEntry[@keyword='analysis.engineering-task.higher-level.identifier']">Missing recommended Higher Level Engineering Task Identifier attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='analysis.engineering-task.specific'] or stc:ClassificationEntry[starts-with(@keyword, 'analysis.engineering-task.specific.')]">Missing recommended Specific Engineering Task attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='analysis.engineering-task.specific'] or stc:ClassificationEntry[@keyword='analysis.engineering-task.specific.name']">Missing recommended Specific Engineering Task Name attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='analysis.engineering-task.specific'] or stc:ClassificationEntry[@keyword='analysis.engineering-task.specific.version']">Missing recommended Specific Engineering Task Version attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='analysis.engineering-task.specific'] or stc:ClassificationEntry[@keyword='analysis.engineering-task.specific.identifier']">Missing recommended Specific Engineering Task Identifier attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='analysis.simulation-task.further-requirements']">Missing recommended Simulation further Requirements attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='analysis.quality-aspects']">Missing recommended Quality Criterion attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='analysis.verification']">Missing recommended Verification Criterion attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='analysis.validation']">Missing recommended Validation Criterion attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='requirements.model.purpose-objectives']">Missing recommended Model Purpose and Objectives attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='requirements.model.subject-information.modeled-entity'] or stc:ClassificationEntry[starts-with(@keyword, 'requirements.model.subject-information.modeled-entity.')]">Missing recommended Modeled Entity attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='requirements.model.subject-information.modeled-entity'] or stc:ClassificationEntry[@keyword='requirements.model.subject-information.modeled-entity.name']">Missing recommended Modeled Entity Name attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='requirements.model.subject-information.modeled-entity'] or stc:ClassificationEntry[@keyword='requirements.model.subject-information.modeled-entity.version']">Missing recommended Modeled Entity Version attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='requirements.model.subject-information.modeled-entity'] or stc:ClassificationEntry[@keyword='requirements.model.subject-information.modeled-entity.identifier']">Missing recommended Modeled Entity Identifier attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='requirements.model.effects-considered']">Missing recommended Required Modeled Effect attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='requirements.model.further-model-requirements']">Missing recommended Further Model Requirements attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='requirements.model.confidentiality']">Missing recommended Simulation Model Confidentiality Level attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='requirements.parameter-value-distribution-function']">Missing recommended Value Distribution Function attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='requirements.parameter.confidentiality']">Missing recommended Parameter Confidentiality Level attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='requirements.test-case'] or stc:ClassificationEntry[starts-with(@keyword, 'requirements.test-case.')]">Missing recommended Test Case Requirements attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='requirements.test-case'] or stc:ClassificationEntry[@keyword='requirements.test-case.confidentiality']">Missing recommended Test Case Confidentiality Level attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='requirements.simulation-environment']">Missing recommended Simulation Environment Requirement attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='requirements.simulation-integration']">Missing recommended Simulation Integration Requirement attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='requirements.quality-assurance']">Missing recommended Quality Assurance Requirements attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='requirements.verification']">Missing recommended Requirements Phase Verification Result attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='design.model']">Missing recommended Model Design Specification attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='design.parameter']">Missing recommended Parameter Design Specification attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='design.test-case']">Missing recommended Test Case Design Specification attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='design.simulation-environment']">Missing recommended Simulation Environment Design Specification attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='design.simulation-integration']">Missing recommended Simulation Integration Design Specification attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='design.quality-assurance']">Missing recommended Design Quality Assurance attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='design.verification']">Missing recommended Design Verification Result attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.model'] or stc:ClassificationEntry[starts-with(@keyword, 'implementation.model.')]">Missing recommended Simulation Model attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.model'] or stc:ClassificationEntry[@keyword='implementation.model.name']">Missing recommended Simulation Model Name attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.model'] or stc:ClassificationEntry[@keyword='implementation.model.version']">Missing recommended Simulation Model Version attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.model'] or stc:ClassificationEntry[@keyword='implementation.model.identifier']">Missing recommended Simulation Model Identifier attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.model'] or stc:ClassificationEntry[@keyword='implementation.model.confidentiality']">Missing recommended Simulation Model Confidentiality Level attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.model'] or stc:ClassificationEntry[@keyword='implementation.model.quality']">Missing recommended Simulation Model Quality attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.parameter'] or stc:ClassificationEntry[starts-with(@keyword, 'implementation.parameter.')] or stc:ClassificationEntry[@keyword='implementation.parameter.confidentiality']">Missing recommended Parameter attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.parameter'] or stc:ClassificationEntry[@keyword='implementation.parameter.name']">Missing recommended Parameter Name attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.parameter'] or stc:ClassificationEntry[@keyword='implementation.parameter.version']">Missing recommended Parameter Version attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.parameter'] or stc:ClassificationEntry[@keyword='implementation.parameter.identifier']">Missing recommended Parameter Identifier attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.parameter'] or stc:ClassificationEntry[@keyword='implementation.parameter.confidentiality']">Missing recommended Parameter Confidentiality Level attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.parameter'] or stc:ClassificationEntry[@keyword='implementation.parameter.quality']">Missing recommended Parameter Quality attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.test-case'] or stc:ClassificationEntry[starts-with(@keyword, 'implementation.test-case.')]">Missing recommended Test Case attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.test-case'] or stc:ClassificationEntry[@keyword='implementation.test-case.name']">Missing recommended Test Case Name attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.test-case'] or stc:ClassificationEntry[@keyword='implementation.test-case.version']">Missing recommended Test Case Version attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.test-case'] or stc:ClassificationEntry[@keyword='implementation.test-case.identifier']">Missing recommended Test Case Identifier attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.test-case'] or stc:ClassificationEntry[@keyword='implementation.test-case.confidentiality']">Missing recommended Test Case Confidentiality Level attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.test-case'] or stc:ClassificationEntry[@keyword='implementation.test-case.quality']">Missing recommended Test Case Quality attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.simulation-environment'] or stc:ClassificationEntry[starts-with(@keyword, 'implementation.simulation-environment.')]">Missing recommended Simulation Environment attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.simulation-environment'] or stc:ClassificationEntry[@keyword='implementation.simulation-environment.name']">Missing recommended Simulation Environment Name attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.simulation-environment'] or stc:ClassificationEntry[@keyword='implementation.simulation-environment.version']">Missing recommended Simulation Environment Version attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.simulation-environment'] or stc:ClassificationEntry[@keyword='implementation.simulation-environment.identifier']">Missing recommended Simulation Environment Identifier attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.simulation-environment'] or stc:ClassificationEntry[@keyword='implementation.simulation-environment.quality']">Missing recommended Simulation Environment Quality attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.simulation-integration'] or stc:ClassificationEntry[@keyword='implementation.simulation-integration.settings']">Missing recommended Solver Setting attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.simulation-integration'] or stc:ClassificationEntry[starts-with(@keyword, 'implementation.simulation-integration.')]">Missing recommended Simulation Integration attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.simulation-integration'] or stc:ClassificationEntry[@keyword='implementation.simulation-integration.name']">Missing recommended Simulation Integration Name attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.simulation-integration'] or stc:ClassificationEntry[@keyword='implementation.simulation-integration.version']">Missing recommended Simulation Integration Version attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.simulation-integration'] or stc:ClassificationEntry[@keyword='implementation.simulation-integration.identifier']">Missing recommended Simulation Integration Identifier attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.simulation-integration'] or stc:ClassificationEntry[@keyword='implementation.simulation-integration.quality']">Missing recommended Simulation Integration Quality attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='implementation.quality-assurance-results']">Missing recommended Implementation Quality Assurance Results attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='execution.test-case'] or stc:ClassificationEntry[starts-with(@keyword, 'execution.test-case.')]">Missing recommended Used Test Case attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='execution.test-case'] or stc:ClassificationEntry[@keyword='execution.test-case.name']">Missing recommended Used Test Case Name attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='execution.test-case'] or stc:ClassificationEntry[@keyword='execution.test-case.version']">Missing recommended Used Test Case Version attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='execution.test-case'] or stc:ClassificationEntry[@keyword='execution.test-case.identifier']">Missing recommended Used Test Case Identifier attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='execution.data']">Missing recommended Execution Raw Data attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='execution.tool'] or stc:ClassificationEntry[@keyword='execution.tool.settings']">Missing recommended Used Tool Settings attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='evaluation.results']">Missing recommended Evaluation Results attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='evaluation.quality-assurance']">Missing recommended Evaluation Quality-Assurance Results attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='fulfillment.quality']">Missing recommended Quality Fulfilled attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='fulfillment.objectives']">Missing recommended Objectives Fulfilled attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='fulfillment.evidence']">Missing recommended Fulfillment Evidence attribute.</sch:assert>
+                    <sch:assert test="stc:ClassificationEntry[@keyword='fulfillment.date']">Missing recommended Fulfillment Date attribute.</sch:assert>
+                </sch:rule>
+            </sch:pattern>
+
+            <sch:pattern>
+                <sch:title>SIC Core: Attribute Rules</sch:title>
+                <sch:let name="allowed-keywords" value="(
+                    'administrative.overall-product',
+                    'administrative.overall-product.name',
+                    'administrative.overall-product.version',
+                    'administrative.overall-product.identifier',
+                    'administrative.overall-product.url',
+                    'administrative.overall-product.full-name',
+                    'administrative.specific-product',
+                    'administrative.specific-product.name',
+                    'administrative.specific-product.version',
+                    'administrative.specific-product.identifier',
+                    'administrative.specific-product.url',
+                    'administrative.specific-product.full-name',
+                    'administrative.ordering-project',
+                    'administrative.ordering-project.name',
+                    'administrative.ordering-project.version',
+                    'administrative.ordering-project.identifier',
+                    'administrative.ordering-project.url',
+                    'administrative.ordering-project.full-name',
+                    'administrative.simulation-request',
+                    'administrative.simulation-request.name',
+                    'administrative.simulation-request.version',
+                    'administrative.simulation-request.identifier',
+                    'administrative.simulation-request.url',
+                    'administrative.simulation-request.full-name',
+                    'administrative.simulation-task',
+                    'administrative.simulation-task.name',
+                    'administrative.simulation-task.version',
+                    'administrative.simulation-task.identifier',
+                    'administrative.simulation-task.url',
+                    'administrative.simulation-task.full-name',
+                    'administrative.simulation-task.confidentiality',
+                    'administrative.simulation-task.date.start',
+                    'administrative.simulation-task.date.delivery',
+                    'administrative.contact.customer-person',
+                    'administrative.contact.customer-entity',
+                    'administrative.contact.contractor-person',
+                    'administrative.contact.contractor-entity',
+                    'administrative.simulation-task.creator',
+                    'administrative.simulation-task.date.creation',
+                    'analysis.item-under-test',
+                    'analysis.item-under-test.name',
+                    'analysis.item-under-test.version',
+                    'analysis.item-under-test.identifier',
+                    'analysis.item-under-test.url',
+                    'analysis.item-under-test.full-name',
+                    'analysis.engineering-task.higher-level',
+                    'analysis.engineering-task.higher-level.name',
+                    'analysis.engineering-task.higher-level.version',
+                    'analysis.engineering-task.higher-level.identifier',
+                    'analysis.engineering-task.higher-level.url',
+                    'analysis.engineering-task.higher-level.full-name',
+                    'analysis.engineering-task.specific',
+                    'analysis.engineering-task.specific.name',
+                    'analysis.engineering-task.specific.version',
+                    'analysis.engineering-task.specific.identifier',
+                    'analysis.engineering-task.specific.url',
+                    'analysis.engineering-task.specific.full-name',
+                    'analysis.simulation-task.objectives',
+                    'analysis.simulation-task.further-requirements',
+                    'analysis.quality-aspects',
+                    'analysis.verification',
+                    'analysis.validation',
+                    'requirements.model.purpose-objectives',
+                    'requirements.model.subject-information.modeled-entity',
+                    'requirements.model.subject-information.modeled-entity.name',
+                    'requirements.model.subject-information.modeled-entity.version',
+                    'requirements.model.subject-information.modeled-entity.identifier',
+                    'requirements.model.subject-information.modeled-entity.url',
+                    'requirements.model.subject-information.modeled-entity.full-name',
+                    'requirements.model.effects-considered',
+                    'requirements.model.further-model-requirements',
+                    'requirements.model.confidentiality',
+                    'requirements.model.quality-requirements',
+                    'requirements.parameter.subject-information.parametrized-entity',
+                    'requirements.parameter-value-distribution-function',
+                    'requirements.parameter.confidentiality',
+                    'requirements.parameter.quality-requirements',
+                    'requirements.test-case',
+                    'requirements.test-case.confidentiality',
+                    'requirements.test-case.quality-requirements',
+                    'requirements.simulation-environment',
+                    'requirements.simulation-environment.quality-requirements',
+                    'requirements.simulation-integration',
+                    'requirements.simulation-integration.quality-requirements',
+                    'requirements.quality-assurance',
+                    'requirements.verification',
+                    'design.model',
+                    'design.model.quality-requirements',
+                    'design.parameter',
+                    'design.parameter.quality-requirements',
+                    'design.test-case',
+                    'design.test-case.quality-requirements',
+                    'design.simulation-environment',
+                    'design.simulation-environment.quality-requirements',
+                    'design.simulation-integration',
+                    'design.simulation-integration.quality-requirements',
+                    'design.quality-assurance',
+                    'design.verification',
+                    'implementation.model',
+                    'implementation.model.name',
+                    'implementation.model.version',
+                    'implementation.model.identifier',
+                    'implementation.model.url',
+                    'implementation.model.full-name',
+                    'implementation.model.confidentiality',
+                    'implementation.model.quality',
+                    'implementation.parameter',
+                    'implementation.parameter.name',
+                    'implementation.parameter.version',
+                    'implementation.parameter.identifier',
+                    'implementation.parameter.url',
+                    'implementation.parameter.full-name',
+                    'implementation.parameter.confidentiality',
+                    'implementation.parameter.quality',
+                    'implementation.test-case',
+                    'implementation.test-case.name',
+                    'implementation.test-case.version',
+                    'implementation.test-case.identifier',
+                    'implementation.test-case.url',
+                    'implementation.test-case.full-name',
+                    'implementation.test-case.confidentiality',
+                    'implementation.test-case.quality',
+                    'implementation.simulation-environment',
+                    'implementation.simulation-environment.name',
+                    'implementation.simulation-environment.version',
+                    'implementation.simulation-environment.identifier',
+                    'implementation.simulation-environment.url',
+                    'implementation.simulation-environment.full-name',
+                    'implementation.simulation-environment.quality',
+                    'implementation.simulation-integration',
+                    'implementation.simulation-integration.name',
+                    'implementation.simulation-integration.version',
+                    'implementation.simulation-integration.identifier',
+                    'implementation.simulation-integration.url',
+                    'implementation.simulation-integration.full-name',
+                    'implementation.simulation-integration.settings',
+                    'implementation.simulation-integration.quality',
+                    'implementation.quality-assurance-results',
+                    'implementation.verdict',
+                    'execution.model',
+                    'execution.model.name',
+                    'execution.model.version',
+                    'execution.model.identifier',
+                    'execution.model.url',
+                    'execution.model.full-name',
+                    'execution.parameter',
+                    'execution.parameter.name',
+                    'execution.parameter.version',
+                    'execution.parameter.identifier',
+                    'execution.parameter.url',
+                    'execution.parameter.full-name',
+                    'execution.test-case',
+                    'execution.test-case.name',
+                    'execution.test-case.version',
+                    'execution.test-case.identifier',
+                    'execution.test-case.url',
+                    'execution.test-case.full-name',
+                    'execution.tool',
+                    'execution.tool.name',
+                    'execution.tool.version',
+                    'execution.tool.identifier',
+                    'execution.tool.url',
+                    'execution.tool.full-name',
+                    'execution.data',
+                    'execution.tool.settings',
+                    'execution.log',
+                    'evaluation.results',
+                    'evaluation.quality-assurance',
+                    'evaluation.verdict',
+                    'fulfillment.task-status',
+                    'fulfillment.quality',
+                    'fulfillment.objectives',
+                    'fulfillment.evidence',
+                    'fulfillment.date'
+                )"/>
+
+                <sch:rule context="/srmd:SimulationResourceMetaData/stc:Classification[@type=$sic-core-type]/stc:ClassificationEntry[@keyword=(
+                    'administrative.simulation-task.date.creation',
+                    'administrative.simulation-task.date.delivery',
+                    'administrative.simulation-task.date.start',
+                    'fulfillment.date'
+                )]" role="warn">
+                    <sch:assert test="matches(.,'^(?:[1-9]\d{3}(-?)(?:(?:0[1-9]|1[0-2])\1(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])\1(?:29|30)|(?:0[13578]|1[02])(?:\1)31|00[1-9]|0[1-9]\d|[12]\d{2}|3(?:[0-5]\d|6[0-5]))|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)(?:(-?)02(?:\2)29|-?366))(?:T(?:[01]\d|2[0-3])(:?)[0-5]\d(?:\3[0-5]\d)?)?(?:Z|[+-][01]\d(?:\3[0-5]\d)?)?$')">
+                        Invalid ISO8601 date value '<sch:value-of select="."/>'.
+                    </sch:assert>
+                </sch:rule>
+
+                <sch:rule context="/srmd:SimulationResourceMetaData/stc:Classification[@type=$sic-core-type]/stc:ClassificationEntry[@keyword=(
+                    'administrative.simulation-task.confidentiality',
+                    'implementation.model.confidentiality',
+                    'implementation.parameter.confidentiality',
+                    'implementation.test-case.confidentiality',
+                    'requirements.model.confidentiality',
+                    'requirements.parameter.confidentiality',
+                    'requirements.test-case.confidentiality'
+                )]" role="warn">
+                    <sch:assert test="matches(.,'^(CSC-0: public|CSC-1: internal|CSC-2: confidential|CSC-3: strictly confidential)$')">
+                        Unknown confidentiality level '<sch:value-of select="."/>'.
+                    </sch:assert>
+                </sch:rule>
+
+                <sch:rule context="/srmd:SimulationResourceMetaData/stc:Classification[@type=$sic-core-type]/stc:ClassificationEntry">
+                    <sch:assert test="@keyword = $allowed-keywords" sqf:fix="fix-delete-entry">
+                        Unknown SIC Core classification attribute '<sch:value-of select="@keyword"/>'.
+                    </sch:assert>
+                    <sqf:fix id="fix-delete-entry">
+                        <sqf:description>
+                            <sqf:title>Remove unknown classification entry</sqf:title>
+                        </sqf:description>
+                        <sqf:delete/>
+                    </sqf:fix>
+                </sch:rule>
+            </sch:pattern>
+        </xs:appinfo>
+    </xs:annotation>
+
+</xs:schema>

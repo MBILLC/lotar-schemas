@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stmd:SimulationTaskMetaData version="1.0.0" name="Fixture STMD (nested in component FMU)" GUID="f1a2b3c4-1111-4abc-9def-000000000001"
+    xmlns:stc="http://ssp-standard.org/SSPTraceability1/SSPTraceabilityCommon"
+    xmlns:stmd="http://ssp-standard.org/SSPTraceability1/SimulationTaskMetaData"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+  <stmd:GeneralInformation>
+    <stc:ResourceReference xlink:type="simple" xlink:href="org.ssp-standard.ssp-traceability.dtmd/DecisionTask.dtmd"/>
+  </stmd:GeneralInformation>
+</stmd:SimulationTaskMetaData>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Source: https://github.com/modelica/ssp-ls-traceability (authoritative repo; PMSFIT/SSPTraceability
+    is a byte-identical synced mirror, confirmed 2026-07-24 for this file).
+    Retrieved 2026-08-04 (Phase C, T-08) from branch main, tag v1.0, commit 5bfa7c2142f74a0daf5989b185872ac9f18d7edb
+    (2025-08-29). Re-checked against origin/main at vendoring time: unchanged since that tag, no drift.
+    No content below was changed from source.
+
+    Defines the SimulationTaskMetaData (STMD) schema – the Credible Simulation Process (CSP) record.
+    7 phases / 28 steps, all minOccurs="0" in the base schema (see stc:StepType in STC.xsd for the
+    Input/Procedure/Output/Rationale/Links/LifeCycleInformation particle structure common to every step).
+    LOTAR's contribution is the risk-scaled obligation matrix on top of this (see
+    LOTAR_Risk_Profile_Process_Plan_2026-07-24.md Sec 3.1 and FMISchematron/process-profile-matrix.csv),
+    enforced by lotar-stmd-risk-r1..r4.sch (T-09) and lotar-stmd-archival.sch (T-10).
+
+    Confirmed against a real, densely-populated corpus instance (DC-Motor,
+    github.com/modelica/ssp-ls-traceability-examples) that all 28 steps and their Input/Procedure/
+    Output/Rationale particles are exercised in practice; stc:Links and stc:LifeCycleInformation's
+    inner lifecycle-state elements are not (every LifeCycleInformation in that instance is empty) –
+    see stmd-full-corpus-test-report.md (T-14) for the calibration implications.
+-->

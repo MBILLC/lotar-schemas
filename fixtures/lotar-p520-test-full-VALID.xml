@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Full P520_Manifest VALID fixture (2026-09-05, D-23 — P515 integration). First fixture in this
+  project that populates every section of P520_SCHEMA.xsd, including one
+  Verification_Validation_Scenario carrying an inline TestCase (the behavioral-model test-case
+  content integrated from P515; its TestCase body is the former fixtures/lotar-p515-test-valid.xml,
+  re-prefixed and re-pathed). Body content taken from the EVRangeExampleV3_P520 worked example.
+
+  Passes: XSD 1.1 (xmlschema) and lxml XSD validation against P520_SCHEMA.xsd;
+  lotar-p520-archival.sch (P520-ARCH-100..103 + 003) with zero failed asserts;
+  lotar-p520-uri.sch (P520-ARCH-001/002) with zero failed asserts. Serves as the PASS fixture for
+  both P520 Schematron layers in scripts/run_lotar_checks.py.
+-->
+<p520:P520_Manifest xmlns:p520="http://www.lotar.org/schemas/mbse/p520#"
+                     xmlns:p500="http://www.lotar.org/schemas/mbse/p500#">
+<p520:GeneralPLMInfo>
+<p500:Unique_object_id>EVExample.FMUs.Intermediate.ElectricRange_V2</p500:Unique_object_id>
+<p500:Unique_baseline_id>InfiniRange-Gate2-Baseline</p500:Unique_baseline_id>
+<p500:Version_identifier>0.81</p500:Version_identifier>
+<p500:Model_Name>EV Range Model External Control</p500:Model_Name>
+<p500:Created_on>2025-01-24T23:16:31Z</p500:Created_on>
+<p500:Last_Modified_Date>2025-08-28T19:28:14Z</p500:Last_Modified_Date>
+<p500:Created_by>T. Okafor</p500:Created_by>
+<p500:Maturity_State>Under development, pre-alpha</p500:Maturity_State>
+<p500:Author_Organization>MBI LLC - Vehicle Energy Systems CAE</p500:Author_Organization>
+<p500:Approver>R. Halvorsen</p500:Approver>
+<p500:Approval_State>Approved for Gate 2 (contingent on production-code review)</p500:Approval_State>
+<p500:Authorization>InfiniRange Powertrain Development Gate 2</p500:Authorization>
+<p500:Usage>WLTP/NEDC architecture-level EV range estimation</p500:Usage>
+<p500:Usage>Torque-arbitration regenerative-braking sensitivity study</p500:Usage>
+<p500:Copyright>https://example.invalid/mbi-llc/copyright</p500:Copyright>
+<p500:License>https://example.invalid/mbi-llc/internal-use-license</p500:License>
+<p500:Export_Controls>https://example.invalid/mbi-llc/export-controls</p500:Export_Controls>
+<p500:Model_Purpose>Substantiate the InfiniRange Gate 2 range/efficiency decision for the torque-arbitration control strategy and battery-variant lineup.</p500:Model_Purpose>
+<p500:Model_Objective>Quantify combined WLTP/NEDC range gain from more aggressive regenerative-brake blending across 4 battery variants.</p500:Model_Objective>
+<p500:System_Designation>EV Powertrain - Electric Range and Torque Arbitration</p500:System_Designation>
+<p500:Model_Dependency>resources/ElectricRange_V2-1.fmu</p500:Model_Dependency>
+<p500:Model_Dependency>resources/TorqueControl.fmu</p500:Model_Dependency>
+<p500:Model_Hierarchy>SystemStructure.ssd</p500:Model_Hierarchy>
+<p500:Abstraction_Level>Architecture-level (early design)</p500:Abstraction_Level>
+<p500:Privacy_Rules>https://example.invalid/mbi-llc/privacy-rules</p500:Privacy_Rules>
+<p500:Organization>MBI LLC</p500:Organization>
+<p500:Export_control_marking>Company confidential, plus Need-to-know Tier 1 suppliers</p500:Export_control_marking>
+<p500:Special_markings>None</p500:Special_markings>
+<p500:Specification_Type_Objectives>Range sensitivity to regenerative-brake blending strategy</p500:Specification_Type_Objectives>
+<p500:Specification_Type_Objectives>Range sensitivity to battery aging (SoC_max derating)</p500:Specification_Type_Objectives>
+</p520:GeneralPLMInfo>
+<p520:ModelDev_Integration_Execution>
+<p520:DevTool_Name>Optimica Compiler Toolkit</p520:DevTool_Name>
+<p520:DevTool_Version>1.34 (as recorded in resources/*.fmu modelDescription.xml generationTool)</p520:DevTool_Version>
+<p520:DevTool_License>Commercial (Modelon)</p520:DevTool_License>
+<p520:DevOS_Name>Linux</p520:DevOS_Name>
+<p520:DevOS_Version>Ubuntu 22.04 LTS</p520:DevOS_Version>
+<p520:DevOS_License>Open source (Ubuntu)</p520:DevOS_License>
+<p520:DevOS_Compiler_Name>GCC</p520:DevOS_Compiler_Name>
+<p520:DevOS_Compiler_Version>11</p520:DevOS_Compiler_Version>
+<p520:DevOS_Compiler_License>Open source (GPL)</p520:DevOS_Compiler_License>
+<p520:Dev_Language>Modelica</p520:Dev_Language>
+<p520:CPU_Number>8</p520:CPU_Number>
+<p520:RAM_Size>32768</p520:RAM_Size>
+<p520:Target_Tool_Name>Modelon Impact (co-simulation orchestration)</p520:Target_Tool_Name>
+</p520:ModelDev_Integration_Execution>
+<p520:Integration_Process>
+<p520:Coupling_Mode>Co-Simulation (FMI 2.0)</p520:Coupling_Mode>
+<p520:Communication_Mode>Variable-step, event-driven</p520:Communication_Mode>
+<p520:Model_Format>FMI 2.0 CoSimulation FMU</p520:Model_Format>
+<p520:Real_Time>false</p520:Real_Time>
+<p520:Parallelization>false</p520:Parallelization>
+<p520:Model_Type>Lumped-parameter electrical/mechanical/thermal EV powertrain</p520:Model_Type>
+<p520:Libraries_Dependencies>Electrification.Utilities.Blocks (internal component library)</p520:Libraries_Dependencies>
+<p520:Libraries_Dependencies>MBI LLC supplier-validated battery/e-machine component library</p520:Libraries_Dependencies>
+<p520:OS_Functions_Dependencies>None beyond standard FMI 2.0 CoSimulation runtime</p520:OS_Functions_Dependencies>
+<p520:Solver_Dependencies>CVode-class variable-step adaptive solver, tolerance 1e-6</p520:Solver_Dependencies>
+<p520:Link_Resources>resources/Standard Battery Parameters.ssv</p520:Link_Resources>
+<p520:Link_Resources>resources/Extended Battery Options.ssv</p520:Link_Resources>
+</p520:Integration_Process>
+<p520:Physics_Content_and_Usage>
+<p520:Dimension>0D (lumped parameter)</p520:Dimension>
+<p520:Method>Ordinary differential/algebraic equations, causal block-diagram formulation</p520:Method>
+<p520:Physics_Domain>Electrical, mechanical, thermal (multi-domain)</p520:Physics_Domain>
+<p520:TimeScale>false</p520:TimeScale>
+<p520:Linearity>false</p520:Linearity>
+<p520:Model_Type_Usage>Architecture-level range and energy-management study</p520:Model_Type_Usage>
+<p520:Environment>WLTP class-3b and NEDC drive cycles, 4 representative ambient climate zones</p520:Environment>
+<p520:Validate_Range>Combined-cycle range within 3% of InfiniRange predecessor platform field data</p520:Validate_Range>
+<p520:Fidelity_Represented_Phenomena>E-machine/converter losses, battery SoC-dependent internal resistance, regenerative-braking torque blending, ambient-temperature effects on range</p520:Fidelity_Represented_Phenomena>
+<p520:Fidelity_Neglected_Phenomena>Detailed thermal management hardware (not yet included, per model description); cell-level battery electrochemistry; road-load aerodynamic detail beyond the standard drive-cycle model</p520:Fidelity_Neglected_Phenomena>
+</p520:Physics_Content_and_Usage>
+<p520:Model_Variables>
+<p520:Key_Inputs><p520:Name>T_in</p520:Name><p520:Value>K</p520:Value><p520:Description>Ambient temperature input</p520:Description></p520:Key_Inputs>
+<p520:Key_Inputs><p520:Name>tau_brake_ref2</p520:Name><p520:Value>N.m</p520:Value><p520:Description>Reference brake torque input from Controllers subsystem</p520:Description></p520:Key_Inputs>
+<p520:Key_Inputs><p520:Name>tau_ref_in</p520:Name><p520:Value>N.m</p520:Value><p520:Description>Reference drive torque input from Controllers subsystem</p520:Description></p520:Key_Inputs>
+<p520:Key_Outputs><p520:Name>acceleration</p520:Name><p520:Value>m/s2</p520:Value><p520:Description>Vehicle acceleration output</p520:Description></p520:Key_Outputs>
+<p520:Key_Outputs><p520:Name>position</p520:Name><p520:Value>m</p520:Value><p520:Description>Vehicle position output</p520:Description></p520:Key_Outputs>
+<p520:Key_Outputs><p520:Name>velocity</p520:Name><p520:Value>m/s</p520:Value><p520:Description>Vehicle velocity output</p520:Description></p520:Key_Outputs>
+<p520:Key_Parameters><p520:Name>P_nom</p520:Name><p520:Value>130000.0 W (Standard); 150000.0 W (Extended)</p520:Value><p520:Description>Nominal electrical machine power</p520:Description></p520:Key_Parameters>
+<p520:Key_Parameters><p520:Name>m</p520:Name><p520:Value>1800.0 kg</p520:Value><p520:Description>Vehicle mass</p520:Description></p520:Key_Parameters>
+<p520:Key_Parameters><p520:Name>batteryOption</p520:Name><p520:Value>Standard / Extended / ExtendedPlus</p520:Value><p520:Description>Battery type enumeration</p520:Description></p520:Key_Parameters>
+<p520:Key_Parameters><p520:Name>battery.SoC_max</p520:Name><p520:Value>1.0 (nominal); 0.85 (DegradedL1); 0.7 (DegradedL2)</p520:Value><p520:Description>Maximum achievable state of charge, used to represent battery aging</p520:Description></p520:Key_Parameters>
+<p520:Signal_Dictionary><p520:Name>-</p520:Name><p520:Value>-</p520:Value><p520:Description>No separate SSB signal dictionary used in this example; connectors are typed inline in SystemStructure.ssd</p520:Description></p520:Signal_Dictionary>
+</p520:Model_Variables>
+<p520:Verification_Validation>
+<p520:Verification_Validation_Scenario>
+<p520:Id>VV-1-RangeGain</p520:Id>
+<p520:Verification_Credibility_Level>CL3</p520:Verification_Credibility_Level>
+<p520:Validation_Credibility_Level>CL3</p520:Validation_Credibility_Level>
+<p520:Validated_by><p500:Link>results/ValidationSummary.md</p500:Link><p500:Name>validates</p500:Name><p500:Description>Local summary of the SIC/MIC Core credibility assessment status and target levels recorded in EVRangeExampleV3s Credibility-Assessment2024-10.srmd</p500:Description><p500:Timestamp_Archiving>2026-08-04T09:00:00Z</p500:Timestamp_Archiving><p500:Timestamp_PLM>2026-08-04T09:00:00Z</p500:Timestamp_PLM></p520:Validated_by>
+<p520:Model_Summary_Report>results/GateReview2Summary.md</p520:Model_Summary_Report>
+<p520:Implements><p500:Link>DecisionTask.dtmd</p500:Link><p500:Name>implements</p500:Name><p500:Description>Governing Credible Decision Process record that commissioned this model report (D-21)</p500:Description><p500:Timestamp_Archiving>2026-08-04T09:00:00Z</p500:Timestamp_Archiving><p500:Timestamp_PLM>2026-08-04T09:00:00Z</p500:Timestamp_PLM></p520:Implements>
+  <p520:TestCase>
+  <p520:Context>
+    <p520:Number>1</p520:Number>
+  </p520:Context>
+  <p520:Scenario>
+    <p520:ExperimentDefinition>
+      <p520:Algorithm>FMICSAlg</p520:Algorithm>
+      <p520:Ncp>100</p520:Ncp>
+      <p520:Start_time>0.0</p520:Start_time>
+      <p520:Stop_time>10.0</p520:Stop_time>
+      <p520:Tolerance>0.0001</p520:Tolerance>
+    </p520:ExperimentDefinition>
+    <p520:PropertyModifications/>
+    <p520:BoundaryConditions>
+      <p520:InputFile source="results/wltp_class3b_inputs.csv" role="configuration"
+                 checksum="9F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08"
+                 checksumType="SHA3-256" sizeBytes="2048"/>
+    </p520:BoundaryConditions>
+  </p520:Scenario>
+  <p520:ReferenceVariables>
+    <p520:Variable>velocity</p520:Variable>
+    <p520:Variable>position</p520:Variable>
+    <p520:Tolerance>
+      <p520:Absolute_tolx>0.001</p520:Absolute_tolx>
+      <p520:Absolute_toly>0.001</p520:Absolute_toly>
+      <p520:Relative_tolx>0.01</p520:Relative_tolx>
+      <p520:Relative_toly>0.01</p520:Relative_toly>
+    </p520:Tolerance>
+    <!-- checksum/checksumType deliberately omitted (2026-07-20): no longer required for
+         archival — ReferenceFileHash below is the sole authoritative fixity mechanism for
+         this file. Still structurally permitted per the base TRelated type if ever wanted. -->
+    <p520:ReferenceResults source="results/VV-1-RangeGain_reference.csv" role="result" sizeBytes="4096"/>
+    <p520:ReferenceFileHash type="sha256" value="9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"/>
+  </p520:ReferenceVariables>
+</p520:TestCase></p520:Verification_Validation_Scenario>
+</p520:Verification_Validation>
+</p520:P520_Manifest>

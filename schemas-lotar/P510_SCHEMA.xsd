@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+	vc:minVersion="1.1"
+	elementFormDefault="qualified"
+	xmlns="http://www.lotar.org/schemas/mbse/p510#"
+	xmlns:p500="http://www.lotar.org/schemas/mbse/p500#"
+	targetNamespace="http://www.lotar.org/schemas/mbse/p510#"
+	attributeFormDefault="unqualified">
+
+	<xs:import namespace="http://www.lotar.org/schemas/mbse/p500#" schemaLocation="P500_Series_Common.xsd"/>
+
+	<xs:complexType name="P510_ManifestType">
+		<xs:annotation>
+			<xs:documentation> High-level structure containing PLM metadata, requirements, and
+				traceability information. </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="GeneralPLMInfo" type="p500:GeneralPLMInfoType">
+				<xs:annotation>
+					<xs:documentation> General Product Lifecycle Management (PLM) metadata and
+						properties. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RequirementsDevStructure" type="RequirementsDevStructureType">
+				<xs:annotation>
+					<xs:documentation> Describes tools, formats, and structures for requirement
+						development. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Requirements_Verification_Validation" type="Requirements_Verification_Validation_Type">
+				<xs:annotation>
+					<xs:documentation> Details scenarios and credibility levels for requirement
+						verification and validation. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Requirements_Traceability" type="Requirements_Traceability_Type">
+				<xs:annotation>
+					<xs:documentation> Defines traceability links and relationships for
+						requirements. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!--
+		GeneralPLMInfoType, Traceability_Link_Type, LinkTypeInterpretation and ContentTypeType
+		now live in P500_Series_Common.xsd (imported above under the p500: prefix), the shared
+		parent namespace for the whole P5xx series, same as P515/P520/P550.
+	-->
+
+	<xs:complexType name="RequirementsDevStructureType">
+		<xs:sequence>
+			<xs:element name="DevTool_Name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Name of the development tool used for requirements. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DevTool_Version" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Version of the development tool used for requirements. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DevTool_License" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> License of the development tool used for requirements. </xs:documentation>
+				</xs:annotation>
+
+			</xs:element>
+			<xs:element name="DevOS_Name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Name of the development operating system. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DevOS_Version" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Version of the development operating system. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DevOS_License" type="xs:string"><!--Specific-->
+				<xs:annotation>
+					<xs:documentation> License of the development operating system. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RequirementAuthoringTechnique" type="AuthoringTechnique">
+				<xs:annotation>
+					<xs:documentation> Technique used for authoring requirements. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Format_name" type="FormatName">
+				<xs:annotation>
+					<xs:documentation> Name of the format used for requirements. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Format_version" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Version of the format used for requirements. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Specification_level" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Level of the specification. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Language" type="xs:string"><!--ISO-CODE-->
+				<xs:annotation>
+					<xs:documentation> Language used in the requirements. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="uses" type="p500:Traceability_Link_Type" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> External resources used in the requirements development. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+		</xs:sequence>
+	</xs:complexType><!--Specific-->
+	<xs:simpleType name="AuthoringTechnique">
+		<xs:annotation>
+					<xs:documentation> Type of authoring technique. </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Formal"/>
+			<xs:enumeration value="Semi-Formal"/>
+			<xs:enumeration value="Informal"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="FormatName">
+		<xs:annotation>
+					<xs:documentation> Type of requirement format. </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="ReqIF"/>
+			<xs:enumeration value="SysML"/>
+			<xs:enumeration value="SysMLV2"/>
+			<xs:enumeration value="SpecIF"/>
+			<xs:enumeration value="Plain Text"/>
+			<xs:enumeration value="Rich Text"/>
+			<xs:enumeration value="MSWord"/>
+			<xs:enumeration value="MSExcel"/>
+			<xs:enumeration value="Database"/>
+			<xs:enumeration value="Other"/>
+		</xs:restriction>
+	</xs:simpleType><!--
+	<xs:simpleType name="Specification_level_type">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Business Requirements Specification (BRS)"/>
+			<xs:enumeration value="Stakeholder Requirements Specification (StRS)"/>
+			<xs:enumeration value="System Requirements Specification (SyRS)"/>
+			<xs:enumeration value="Software Requirements Specification (SRS)"/>
+			<xs:enumeration value="System Operational Concept (OpsCon)"/>
+			<xs:enumeration value="Other"/>
+		</xs:restriction>
+	</xs:simpleType>
+	-->
+	<xs:complexType name="Requirements_Verification_Validation_Type">
+		<xs:sequence>
+			<xs:element name="Scenario" type="Verification_Validation_Scenario_Type" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Verification and validation scenarios for the requirements. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element name="Specification_Consistency" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation> Indicates if the specification is consistent. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Specification_Completeness" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation> Indicates if the specification is complete. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Verification_Validation_Scenario_Type">
+		<xs:sequence>
+			<xs:element name="Id" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Identifier for the verification/validation scenario. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Verification_Credibility_Level" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Credibility level for verification. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Validation_Credibility_Level" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Credibility level for validation. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:choice>
+				<xs:element name="Validated_by" type="p500:Traceability_Link_Type"/>
+				<xs:element name="Verified_by" type="p500:Traceability_Link_Type"/>
+			</xs:choice>
+			<xs:element name="Model_Summary_Report" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation> URI to a summary report of the model used in the scenario. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+				<!--FIXME:
+			more information-->
+		</xs:sequence>
+	</xs:complexType><!--Specific-->
+	<xs:complexType name="Requirements_Traceability_Type">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="Affected_by" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Link to requirements that affect the current requirement. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Affects" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Link to requirements that are affected by the current requirement. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Constrained_by" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Link to requirements that constrain the current requirement. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Constrains" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Link to requirements that are constrained by the current requirement. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Decomposed_by" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Link to requirements that decompose the current requirement. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Decomposes" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Link to requirements that are decomposed by the current requirement. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Elaborated_by" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Link to requirements that elaborate the current requirement. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Elaborates" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Link to requirements that are elaborated by the current requirement. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Implemented_by" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Link to requirements that implement the current requirement. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Implements" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Link to requirements that are implemented by the current requirement. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Satisfied_by" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Link to requirements that satisfy the current requirement. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element name="Satisfies" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Link to requirements that are satisfied by the current requirement. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Specified_by" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Link to requirements that specify the current requirement. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Specifies" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Link to requirements that are specified by the current requirement. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Tracked_by" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Link to requirements that track the current requirement. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Tracks" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Link to requirements that are tracked by the current requirement. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element name="Uses" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Link to requirements that are used by the current requirement. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Validated_by" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Link to requirements that validate the current requirement. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Verified_by" type="p500:Traceability_Link_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Link to requirements that verify the current requirement. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
+	<xs:element name="P510_Manifest" type="P510_ManifestType">
+		<xs:annotation>
+			<xs:documentation> The root element encapsulating general PLM information, requirements
+				structure, verification, validation, and traceability. </xs:documentation>
+		</xs:annotation>
+	</xs:element>
+</xs:schema>

@@ -1,0 +1,11 @@
+LOTAR-authored files in this repository (schemas-lotar/, vocabularies/, fixtures/, fixtures-archive/,
+and the lotar-*.sch overlays in schemas-vendored/) are draft working material of the NAS9300-520
+(LOTAR) working group, prepared by Model Based Innovation LLC. Copyright (c) 2026 Model Based
+Innovation LLC. All rights reserved until the working group decides the licensing of the published
+standard; no rights are granted beyond viewing and evaluating the material for that working group's
+purposes.
+
+Vendored files in schemas-vendored/ keep their upstream licences, recorded in each file's header
+comment or *_header.txt sidecar: SSP-LS-Traceability and SSP schemas (Modelica Association,
+BSD 2-Clause), FMI-LS-REF (Modelica Association, BSD 2-Clause), MIC Core and SIC Core (prostep ivip,
+published open standards).

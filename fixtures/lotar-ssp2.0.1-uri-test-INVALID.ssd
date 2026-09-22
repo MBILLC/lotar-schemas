@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Dedicated URI-restriction test fixture (2026-07-22) for lotar-ssp2.0.1-archival.sch's
+  SSP-ARCH-050/051/052/053/054/055/056. Structurally valid against SystemStructureDescription.xsd
+  2.0.1 (xs:anyURI's lexical space is very permissive — absolute/scheme/backslash/traversal values
+  are all still XSD-valid strings, which is exactly why the Schematron layer exists). Each
+  violation below is deliberately isolated to exercise exactly one lettered assertion:
+
+    - Component/@source="/abs/path/Comp1.fmu"                    -> SSP-ARCH-050a (absolute path)
+    - Component/@iconSource="resources\icons\comp1.svg"           -> SSP-ARCH-051b (backslash)
+    - MetaData/@source="http://example.com/meta.txt"              -> SSP-ARCH-052c (scheme)
+    - Signature/@source="resources/../../../etc/passwd"           -> SSP-ARCH-053d (traversal)
+    - SignalDictionary/@source="//server/share/dict.ssb"          -> SSP-ARCH-054a (network path)
+    - ParameterMapping/@source="C:/resources/mapping.ssm"         -> SSP-ARCH-055c (drive letter)
+    - ParameterValues/@source="../outside/params.ssv"             -> SSP-ARCH-056d (traversal)
+
+  Root-level [M] mandates (@id/@generationTool/@generationDateAndTime), Component/@type, and
+  Connector type are all still satisfied so that ONLY the URI-restriction assertions above fail —
+  this file is not intended to also exercise the pre-existing SSP-ARCH-0xx/1-4 pattern failures
+  (see lotar-ssp2.0.1-test-minimal-INVALID.ssd for that).
+-->
+<ssd:SystemStructureDescription
+    xmlns:ssd="http://ssp-standard.org/SSP1/SystemStructureDescription"
+    xmlns:ssc="http://ssp-standard.org/SSP1/SystemStructureCommon"
+    xmlns:ssv="http://ssp-standard.org/SSP1/SystemStructureParameterValues"
+    version="2.0"
+    name="LOTAR-SSP-URI-Test-Invalid"
+    id="id_55555555-5555-5555-5555-555555555555"
+    generationTool="LOTAR URI test fixture (hand-authored)"
+    generationDateAndTime="2026-07-22T00:00:00Z">
+
+  <ssd:System name="TopSystem" id="id_66666666-6666-6666-6666-666666666666">
+    <ssd:Connectors>
+      <ssd:Connector name="in1" kind="input">
+        <ssc:Real/>
+      </ssd:Connector>
+      <ssd:Connector name="out1" kind="output">
+        <ssc:Real/>
+      </ssd:Connector>
+    </ssd:Connectors>
+    <ssd:ParameterBindings>
+      <ssd:ParameterBinding>
+        <ssd:ParameterValues source="../outside/params.ssv"/>
+        <ssd:ParameterMapping source="C:/resources/mapping.ssm"/>
+        <ssc:MetaData kind="general" type="text/plain" source="http://example.com/meta.txt"/>
+        <ssc:Signature role="authenticity" type="application/pkcs7-signature" source="resources/../../../etc/passwd"/>
+      </ssd:ParameterBinding>
+    </ssd:ParameterBindings>
+    <ssd:Elements>
+      <ssd:Component name="Comp1" type="application/x-fmu-sharedlibrary"
+                      source="/abs/path/Comp1.fmu" iconSource="resources\icons\comp1.svg"
+                      implementation="CoSimulation">
+        <ssd:Connectors>
+          <ssd:Connector name="u" kind="input">
+            <ssc:Real/>
+          </ssd:Connector>
+          <ssd:Connector name="y" kind="output">
+            <ssc:Real/>
+          </ssd:Connector>
+        </ssd:Connectors>
+      </ssd:Component>
+    </ssd:Elements>
+    <ssd:Connections>
+      <ssd:Connection startConnector="in1" endElement="Comp1" endConnector="u"/>
+      <ssd:Connection startElement="Comp1" startConnector="y" endConnector="out1"/>
+    </ssd:Connections>
+    <ssd:SignalDictionaries>
+      <ssd:SignalDictionary name="SD1" source="//server/share/dict.ssb"/>
+    </ssd:SignalDictionaries>
+  </ssd:System>
+
+</ssd:SystemStructureDescription>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Source: https://github.com/modelica/ssp-ls-traceability (authoritative repo).
+    Retrieved 2026-08-04 (Phase C, T-08) from branch main, tag v1.0, commit 5bfa7c2142f74a0daf5989b185872ac9f18d7edb
+    (2025-08-29). Re-checked against origin/main at vendoring time: unchanged since that tag, no drift.
+    No content below was changed from source.
+
+    Defines the DecisionTaskMetaData (DTMD) schema – the Credible Decision Process (CDP) record,
+    one level above STMD (see LOTAR_Risk_Profile_Process_Plan_2026-07-24.md Sec 2's process diagram).
+    5 phases / 10 steps, all minOccurs="0". DefinitionPhase/DefineResultQuality is where LOTAR's
+    risk.level keyword (R1..R4, D-7/D-17) attaches – confirmed a direct textual match to prostep's
+    own CSP/CDP diagram (Figure 8, "Assign specific Credibilities"), see T-01.
+
+    Checked for XSD defects while vendoring, per this project's convention (T-08): none found. Unlike
+    MTMD.xsd (see MTMD.xsd's own header), DTMD.xsd's top-level attribute documentation strings
+    correctly say "DTMD" throughout ("Version of DTMD format", "variant DTMDs", "this DTMD file") –
+    no STMD-copy-paste leftovers here.
+
+    No real .dtmd instance has been found in any corpus searched so far (DC-Motor,
+    modelica/SSPExamples) – see stmd-corpus-manifest.md (T-13). The DTMD profile
+    (lotar-dtmd-archival.sch, T-09a) ships without corpus validation, flagged as a real limitation,
+    not glossed over.
+-->

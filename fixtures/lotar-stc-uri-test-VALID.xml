@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Dedicated URI-restriction test fixture (2026-07-22) for lotar-stc-archival.sch's
+  STC-ARCH-110/111 (Resource/@source, Resource/@master, Resource/Summary/@source). This is a
+  synthetic Schematron-only fixture, not a full STMD instance: STC.xsd's stc:Resource element is
+  only ever embedded inside the (not-vendored-in-this-project) STMD schema's phase/step/particle
+  structure, so there is no standalone root element to validate this fragment against an XSD.
+  Schematron itself has no dependency on XSD validity — it only needs well-formed XML with the
+  right element/attribute shape for its XPath contexts to match, so a lightweight non-standard
+  wrapper root (TestFixture, not part of any LOTAR namespace) is used here purely to hold multiple
+  stc:Resource siblings for one Schematron run. Real corpus evidence for the relative-source shape
+  this exercises: SSPExamples/*/extra/org.ssp-standard.ssp-traceability.stmd/SimulationTask.stmd
+  (e.g. source="Test.srmd", source="Example1.md").
+-->
+<TestFixture xmlns:stc="http://ssp-standard.org/SSPTraceability1/SSPTraceabilityCommon">
+
+  <!-- Resource/@source relative (STC-ARCH-110a-d exercised: passes all four).
+       administrative.size-bytes Classification entry is required by the pre-existing
+       STC-ARCH-102a (lotar-stc-archival.sch's Pattern 3) — included so this fixture is a clean
+       PASS against the whole file, not just the new URI patterns. -->
+  <stc:Resource kind="document" type="text/markdown" source="docs/readme.md" id="res-001">
+    <!-- Resource/Summary/@source relative (STC-ARCH-111a-d exercised: passes all four). -->
+    <stc:Summary type="text/markdown" source="docs/readme-summary.md"/>
+    <stc:Classification type="org.lotar-international.lotar-core.common">
+      <stc:ClassificationEntry keyword="administrative.size-bytes">1024</stc:ClassificationEntry>
+    </stc:Classification>
+  </stc:Resource>
+
+  <!-- Resource/@master as a genuine external identifier (urn:), not a local filesystem path —
+       STC-ARCH-110e-g must NOT fire here (external references are intentionally permitted). -->
+  <stc:Resource kind="model" type="application/x-fmu-sharedlibrary" source="models/Comp1.fmu"
+                master="urn:plm:example-corp:object:12345" id="res-002">
+    <stc:Classification type="org.lotar-international.lotar-core.common">
+      <stc:ClassificationEntry keyword="administrative.size-bytes">2048</stc:ClassificationEntry>
+    </stc:Classification>
+  </stc:Resource>
+
+</TestFixture>

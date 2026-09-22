@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Deliberately non-compliant fixture. Structurally valid against
+  SystemStructureParameterValues.xsd (2.0.1); validate that first, then note it intentionally
+  violates several lotar-ssv2.0.1-archival.sch rules to exercise the [I]-tier rules that the real
+  4-file corpus does not exercise (no ssv:String/ssv:Binary usage observed there, and no duplicate
+  Parameter names):
+
+    - SSV-ARCH-001/002 [M]: no @generationTool/@generationDateAndTime on the root
+    - SSV-ARCH-010 [I]: two Parameter elements share @name="dup"
+    - SSV-ARCH-020 [I]: String parameter with BOTH @value and an inline Value child
+    - SSV-ARCH-021 [I]: Enumeration parameter with BOTH @value and an inline Value child
+    - SSV-ARCH-022 [I]: Enumeration parameter with @name referencing an undefined enumeration
+    - SSV-ARCH-023 [I]: Binary parameter with BOTH @value and an inline Value child
+    - SSV-ARCH-030 [I]: Real parameter with @unit referencing an undefined unit
+-->
+<ssv:ParameterSet
+    xmlns:ssv="http://ssp-standard.org/SSP1/SystemStructureParameterValues"
+    xmlns:ssc="http://ssp-standard.org/SSP1/SystemStructureCommon"
+    version="2.0"
+    name="LOTAR-SSV-Test-Minimal-Invalid">
+
+  <ssv:Parameters>
+    <ssv:Parameter name="dup">
+      <ssv:String value="hello">
+        <ssv:Value value="world"/>
+      </ssv:String>
+    </ssv:Parameter>
+    <ssv:Parameter name="dup">
+      <ssv:Enumeration value="Standard" name="Undefined.Enum">
+        <ssv:Value value="Standard"/>
+      </ssv:Enumeration>
+    </ssv:Parameter>
+    <ssv:Parameter name="badUnit">
+      <ssv:Real value="1.0" unit="undefinedUnit"/>
+    </ssv:Parameter>
+    <ssv:Parameter name="badBinary">
+      <ssv:Binary value="0A">
+        <ssv:Value value="0B"/>
+      </ssv:Binary>
+    </ssv:Parameter>
+  </ssv:Parameters>
+
+</ssv:ParameterSet>

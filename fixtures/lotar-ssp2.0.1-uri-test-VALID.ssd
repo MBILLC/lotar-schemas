@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Dedicated URI-restriction test fixture (2026-07-22) for lotar-ssp2.0.1-archival.sch's
+  SSP-ARCH-050/051/052/053/054/055/056 (relative-only URI restriction). Every @source/@iconSource
+  value below is a well-formed, archive-relative reference — this file is expected to PASS both
+  XSD validation (SystemStructureDescription.xsd 2.0.1) and every Schematron pattern in
+  lotar-ssp2.0.1-archival.sch, including the pre-existing [M]/[I] mandates (not just the new URI
+  ones), so it doubles as a general full-corpus-style positive fixture.
+-->
+<ssd:SystemStructureDescription
+    xmlns:ssd="http://ssp-standard.org/SSP1/SystemStructureDescription"
+    xmlns:ssc="http://ssp-standard.org/SSP1/SystemStructureCommon"
+    xmlns:ssv="http://ssp-standard.org/SSP1/SystemStructureParameterValues"
+    version="2.0"
+    name="LOTAR-SSP-URI-Test-Valid"
+    id="id_33333333-3333-3333-3333-333333333333"
+    generationTool="LOTAR URI test fixture (hand-authored)"
+    generationDateAndTime="2026-07-22T00:00:00Z">
+
+  <ssd:System name="TopSystem" id="id_44444444-4444-4444-4444-444444444444">
+    <ssd:Connectors>
+      <ssd:Connector name="in1" kind="input">
+        <ssc:Real/>
+      </ssd:Connector>
+      <ssd:Connector name="out1" kind="output">
+        <ssc:Real/>
+      </ssd:Connector>
+    </ssd:Connectors>
+    <ssd:ParameterBindings>
+      <!-- ParameterBinding #1: inline ParameterValues (ARCH-033 baseline), MetaData/Signature/
+           ParameterMapping each use a relative @source (ARCH-052/053/055 exercised). -->
+      <ssd:ParameterBinding>
+        <ssd:ParameterValues>
+          <ssv:ParameterSet version="2.0" name="Defaults">
+            <ssv:Parameters>
+              <ssv:Parameter name="p1">
+                <ssv:Real value="1.0"/>
+              </ssv:Parameter>
+            </ssv:Parameters>
+          </ssv:ParameterSet>
+        </ssd:ParameterValues>
+        <ssd:ParameterMapping source="resources/mapping.ssm"/>
+        <ssc:MetaData kind="general" type="text/plain" source="resources/meta/general.txt"/>
+        <ssc:Signature role="authenticity" type="application/pkcs7-signature" source="resources/signature.p7s"/>
+      </ssd:ParameterBinding>
+      <!-- ParameterBinding #2: ParameterValues element itself uses @source (ARCH-056 exercised),
+           satisfying ARCH-033 via the child element's mere presence (ParameterBinding itself has
+           no @source). -->
+      <ssd:ParameterBinding>
+        <ssd:ParameterValues source="resources/params2.ssv"/>
+      </ssd:ParameterBinding>
+    </ssd:ParameterBindings>
+    <ssd:Elements>
+      <!-- Component/@source and @iconSource both relative (ARCH-050/051 exercised). -->
+      <ssd:Component name="Comp1" type="application/x-fmu-sharedlibrary"
+                      source="resources/Comp1.fmu" iconSource="resources/icons/comp1.svg"
+                      implementation="CoSimulation">
+        <ssd:Connectors>
+          <ssd:Connector name="u" kind="input">
+            <ssc:Real/>
+          </ssd:Connector>
+          <ssd:Connector name="y" kind="output">
+            <ssc:Real/>
+          </ssd:Connector>
+        </ssd:Connectors>
+      </ssd:Component>
+    </ssd:Elements>
+    <ssd:Connections>
+      <ssd:Connection startConnector="in1" endElement="Comp1" endConnector="u"/>
+      <ssd:Connection startElement="Comp1" startConnector="y" endConnector="out1"/>
+    </ssd:Connections>
+    <ssd:SignalDictionaries>
+      <!-- SignalDictionary/@source relative (ARCH-054 exercised). -->
+      <ssd:SignalDictionary name="SD1" source="resources/dictionary.ssb"/>
+    </ssd:SignalDictionaries>
+  </ssd:System>
+
+</ssd:SystemStructureDescription>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Layer-2 integration fixture (2026-07-22) for lotar_uri_resolve_check.py's _fmu_root_via_extra():
+  demonstrates the corrected FMU-root resolution base for fmi-ls-ref's Related/@source. This file
+  is deliberately packaged at the real "extra/org.fmi-standard.fmi-ls-ref/" location relative to
+  the enclosing lotar-fmi-ls-ref-archive-test-VALID/ directory, which stands in for an unzipped
+  FMU root (sibling documentation/ and results/ directories, as a real FMU's resources/,
+  documentation/, sources/, modelDescription.xml would sit). Both Related/@source values below are
+  relative to that FMU root, NOT to this manifest's own extra/org.fmi-standard.fmi-ls-ref/
+  directory — confirming they resolve up through "extra/" correctly rather than being (wrongly)
+  looked for at extra/org.fmi-standard.fmi-ls-ref/documentation/UserGuide.pdf etc. Checksums are
+  real SHA3-256 digests of the actual sibling files, so this also exercises full checksum
+  verification, not just path resolution.
+-->
+<fmiReferences xmlns:fmi-ls="http://fmi-standard.org/fmi-ls-manifest"
+                fmi-ls:fmi-ls-name="org.fmi-standard.fmi-ls-ref"
+                fmi-ls:fmi-ls-version="1.0.0-alpha"
+                fmi-ls:fmi-ls-description="Layered Standard providing information on related files included in an FMU.">
+  <Related source="documentation/UserGuide.pdf" role="document" type="application/pdf"
+            checksum="29eb23992d7e1b8390451a426e2bb0d7ea89519b54db66742c595c9ae60e1720"
+            checksumType="SHA3-256"/>
+  <Related source="results/reference1.csv" role="result" type="text/csv"
+            checksum="488bb09e4771206ef79e5ac44ea81d5280357ce641ce826c5d96165d90f4b530"
+            checksumType="SHA3-256"/>
+</fmiReferences>

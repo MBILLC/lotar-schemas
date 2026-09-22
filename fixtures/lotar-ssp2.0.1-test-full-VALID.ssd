@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ssd:SystemStructureDescription
+    xmlns:ssd="http://ssp-standard.org/SSP1/SystemStructureDescription"
+    xmlns:ssc="http://ssp-standard.org/SSP1/SystemStructureCommon"
+    xmlns:ssv="http://ssp-standard.org/SSP1/SystemStructureParameterValues"
+    version="2.0"
+    name="LOTAR-SSP-Test-Full-Valid"
+    id="id_11111111-1111-1111-1111-111111111111"
+    description="Full-coverage valid SSP test fixture for LOTAR-SSP-2.0.1-ARCHIVAL"
+    author="LOTAR Working Group"
+    fileversion="1.0.0"
+    copyright="Copyright 2026 LOTAR Working Group"
+    license="CC-BY-4.0"
+    generationTool="LOTAR test fixture (hand-authored)"
+    generationDateAndTime="2026-07-21T00:00:00Z">
+
+  <ssd:System name="TopSystem" id="id_22222222-2222-2222-2222-222222222222" description="Top-level system">
+    <ssd:Connectors>
+      <ssd:Connector name="in1" kind="input">
+        <ssc:Real unit="m/s"/>
+      </ssd:Connector>
+      <ssd:Connector name="out1" kind="output">
+        <ssc:Real/>
+      </ssd:Connector>
+    </ssd:Connectors>
+    <ssd:ParameterBindings>
+      <ssd:ParameterBinding>
+        <ssd:ParameterValues>
+          <ssv:ParameterSet version="2.0" name="Defaults">
+            <ssv:Parameters>
+              <ssv:Parameter name="p1">
+                <ssv:Real value="1.0"/>
+              </ssv:Parameter>
+            </ssv:Parameters>
+          </ssv:ParameterSet>
+        </ssd:ParameterValues>
+        <ssd:ParameterMapping source="resources/mapping.ssm"/>
+        <ssc:MetaData kind="general" type="text/plain">
+          <ssc:Content>Inline metadata content for the LOTAR test fixture.</ssc:Content>
+        </ssc:MetaData>
+        <ssc:Signature role="authenticity" type="application/pkcs7-signature" source="resources/signature.p7s"/>
+      </ssd:ParameterBinding>
+    </ssd:ParameterBindings>
+    <ssd:Elements>
+      <ssd:Component name="Comp1" type="application/x-fmu-sharedlibrary" source="resources/Comp1.fmu" implementation="CoSimulation">
+        <ssd:Connectors>
+          <ssd:Connector name="u" kind="input">
+            <ssc:Real/>
+          </ssd:Connector>
+          <ssd:Connector name="y" kind="output">
+            <ssc:Real/>
+          </ssd:Connector>
+        </ssd:Connectors>
+      </ssd:Component>
+    </ssd:Elements>
+    <ssd:Connections>
+      <ssd:Connection startConnector="in1" endElement="Comp1" endConnector="u"/>
+      <ssd:Connection startElement="Comp1" startConnector="y" endConnector="out1"/>
+    </ssd:Connections>
+    <ssd:SignalDictionaries>
+      <ssd:SignalDictionary name="SD1" source="resources/dictionary.ssb"/>
+    </ssd:SignalDictionaries>
+  </ssd:System>
+
+  <ssd:Enumerations>
+    <ssc:Enumeration name="Enum1">
+      <ssc:Item name="A" value="0"/>
+      <ssc:Item name="B" value="1"/>
+    </ssc:Enumeration>
+  </ssd:Enumerations>
+
+  <ssd:Units>
+    <ssc:Unit name="UnitA">
+      <ssc:BaseUnit kg="1"/>
+    </ssc:Unit>
+    <ssc:Unit name="UnitB">
+      <ssc:BaseUnit m="1"/>
+    </ssc:Unit>
+  </ssd:Units>
+
+</ssd:SystemStructureDescription>

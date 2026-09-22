@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Dedicated URI-restriction test fixture (2026-07-22) for lotar-fmi-ls-ref-uri.sch's
+  FMILSREF-ARCH-001 (Related/@source relative-only). A standalone fmi-ls-ref manifest, structurally
+  valid against fmi3LayeredStandardReferenceManifest.xsd.
+-->
+<fmiReferences xmlns:fmi-ls="http://fmi-standard.org/fmi-ls-manifest"
+                fmi-ls:fmi-ls-name="org.fmi-standard.fmi-ls-ref"
+                fmi-ls:fmi-ls-version="1.0.0-alpha"
+                fmi-ls:fmi-ls-description="Layered Standard providing information on related files included in an FMU.">
+  <Related source="documentation/UserGuide.pdf" role="document" type="application/pdf"
+            checksum="9F86D081" checksumType="SHA3-256"/>
+  <Related source="results/reference1.csv" role="result" type="text/csv"/>
+</fmiReferences>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Dedicated URI-restriction test fixture (2026-07-22): @data="../outside/Comp1.fmu" exercises
+  SRMD-ARCH-100f (".." path traversal) only.
+-->
+<srmd:SimulationResourceMetaData
+    xmlns:srmd="http://ssp-standard.org/SSPTraceability1/SimulationResourceMetaData"
+    version="1.0.0"
+    name="LOTAR-SRMD-URI-Test-Invalid-Traversal"
+    data="../outside/Comp1.fmu"
+    checksum="9F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A0"
+    checksumType="SHA3-256"/>

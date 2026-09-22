@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+	vc:minVersion="1.1"
+	elementFormDefault="qualified"
+	xmlns="http://www.lotar.org/schemas/mbse/p550#"
+	xmlns:p500="http://www.lotar.org/schemas/mbse/p500#"
+	targetNamespace="http://www.lotar.org/schemas/mbse/p550#"
+	attributeFormDefault="unqualified">
+
+	<xs:import namespace="http://www.lotar.org/schemas/mbse/p500#" schemaLocation="P500_Series_Common.xsd"/>
+
+	<xs:complexType name="P550_ManifestType">
+		<xs:sequence>
+			<xs:element name="GeneralPLMInfo"
+				type="p500:GeneralPLMInfoType">
+			<xs:annotation>
+					<xs:documentation> General Product Lifecycle Management (PLM) metadata and
+						properties. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element name="Model_Links"
+				type="Model_Links">
+				<xs:annotation>
+					<xs:documentation> Links to other models and resources. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+		</xs:sequence>
+	</xs:complexType>
+
+	<!--
+		GeneralPLMInfoType and ContentTypeType now live in P500_Series_Common.xsd (imported
+		above under the p500: prefix), since they are shared verbatim with P510, P515 and P520.
+		P550 keeps its own distinct link/traceability model below (Model_Links,
+		Traceability_Link, Metadata_Link, Link_Type, Link_Management) rather than adopting
+		Traceability_Link_Type/LinkTypeInterpretation, since those are not shared with P550.
+	-->
+
+	<xs:complexType name="Link_Management">
+		<xs:sequence>
+			<xs:element name="changeNotification" type="xs:string"
+				minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Indicates if change notifications are enabled for the link.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element name="notificationService" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						Service used for sending notifications about changes to the linked resource.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element name="notificationAction" type="xs:string"
+				minOccurs="0">
+					<xs:annotation>
+					<xs:documentation>
+						Action taken when a change notification is sent.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element name="staticLink" type="xs:anyURI"
+				minOccurs="0">
+					<xs:annotation>
+					<xs:documentation>
+						Static link to the resource.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+		</xs:sequence>
+
+	</xs:complexType>
+
+	<xs:complexType name="Model_Links">
+		<xs:sequence>
+			<xs:element name="traceabilityLink"
+				type="Traceability_Link" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+					<xs:documentation>
+						Traceability links to other model elements or resources.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element name="metadataLinks" type="Metadata_Link" minOccurs="0"
+				maxOccurs="unbounded">
+					<xs:annotation>
+					<xs:documentation>
+						Additional metadata links associated with the traceability link.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+
+		</xs:sequence>
+
+	</xs:complexType>
+
+	<xs:complexType name="Traceability_Link">
+		<xs:sequence>
+			<xs:element name="metadataToModelElement" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>
+						Metadata associated with the model element.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element name="modelElementToElementLink" type="xs:string">
+					<xs:annotation>
+					<xs:documentation>
+						Link from the model element to another element.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element name="linkType"
+				type="Link_Type">
+					<xs:annotation>
+					<xs:documentation>
+						Type of the link between model elements.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element name="metadataLinks" type="Metadata_Link" minOccurs="0"
+				maxOccurs="unbounded">
+					<xs:annotation>
+					<xs:documentation>
+						Additional metadata links associated with the traceability link.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+		</xs:sequence>
+
+	</xs:complexType>
+
+	<xs:complexType name="Metadata_Link">
+		<xs:sequence>
+			<xs:element name="property" type="xs:string">
+					<xs:annotation>
+					<xs:documentation>
+						Name of the metadata property.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element name="value" type="xs:string">
+					<xs:annotation>
+					<xs:documentation>
+						Value of the metadata property.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+		</xs:sequence>
+
+	</xs:complexType>
+
+
+
+	<xs:simpleType name="Link_Type">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="publishedElements"/>
+			<xs:enumeration value="hyperLink"/>
+			<xs:enumeration value="OSLC"/>
+			<xs:enumeration value="JSON-WSP"/>
+			<xs:enumeration value="JSON-RPC"/>
+			<xs:enumeration value="CRUD"/>
+			<xs:enumeration value="REST"/>
+			<xs:enumeration value="SOAP"/>
+			<xs:enumeration value="WSFL"/>
+			<xs:enumeration value="WSCL"/>
+			<xs:enumeration value="XINS"/>
+			<xs:enumeration value="Other"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+
+
+	<xs:element name="P550_Manifest"
+		type="P550_ManifestType" >
+			<xs:annotation>
+				<xs:documentation>
+					Root element for the P550 Manifest schema.
+				</xs:documentation>
+			</xs:annotation>
+	</xs:element>
+</xs:schema>

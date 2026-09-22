@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Dedicated URI-restriction test fixture (2026-07-22) for lotar-fmi-ls-ref-uri.sch's
+  FMILSREF-ARCH-001. Four Related entries, each isolating exactly one lettered assertion:
+
+    - rel-A/@source = "/abs/documentation/UserGuide.pdf"      -> FMILSREF-ARCH-001a (absolute path)
+    - rel-B/@source = "documentation\UserGuide.pdf"            -> FMILSREF-ARCH-001b (backslash)
+    - rel-C/@source = "https://example.com/UserGuide.pdf"      -> FMILSREF-ARCH-001c (scheme)
+    - rel-D/@source = "results/../../../etc/passwd"            -> FMILSREF-ARCH-001d (traversal)
+-->
+<fmiReferences xmlns:fmi-ls="http://fmi-standard.org/fmi-ls-manifest"
+                fmi-ls:fmi-ls-name="org.fmi-standard.fmi-ls-ref"
+                fmi-ls:fmi-ls-version="1.0.0-alpha"
+                fmi-ls:fmi-ls-description="Layered Standard providing information on related files included in an FMU.">
+  <Related source="/abs/documentation/UserGuide.pdf" role="document" type="application/pdf"/>
+  <Related source="documentation\UserGuide.pdf" role="document" type="application/pdf"/>
+  <Related source="https://example.com/UserGuide.pdf" role="document" type="application/pdf"/>
+  <Related source="results/../../../etc/passwd" role="result" type="text/csv"/>
+</fmiReferences>

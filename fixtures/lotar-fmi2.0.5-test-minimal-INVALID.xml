@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fmiModelDescription
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="fmi205/fmi-standard-2.0.5/schema/fmi2ModelDescription.xsd"
+    fmiVersion="2.0"
+    modelName="Minimal.Test.Model"
+    guid="{00000000-0000-0000-0000-000000000000}">
+    <CoSimulation modelIdentifier="MinimalTest"/>
+    <ModelVariables>
+        <ScalarVariable name="x" valueReference="0">
+            <Real/>
+        </ScalarVariable>
+    </ModelVariables>
+    <ModelStructure/>
+</fmiModelDescription>

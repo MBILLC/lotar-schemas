@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Dedicated URI-restriction test fixture (2026-07-22) for lotar-p520-uri.sch's P520-ARCH-001
+  (Model_Summary_Report relative-only). Synthetic Schematron-only fixture using a lightweight
+  wrapper limited to the element this rule targets — P520_SCHEMA.xsd's full ModelDev_Integration_
+  Execution_Type structure is out of scope for this narrowly-focused URI check (no broader P520
+  archival-completeness Schematron profile exists yet; see lotar-p520-uri.sch's own header).
+-->
+<TestFixture xmlns:p520="http://www.lotar.org/schemas/mbse/p520#">
+  <p520:Model_Summary_Report>reports/vv-summary.pdf</p520:Model_Summary_Report>
+</TestFixture>

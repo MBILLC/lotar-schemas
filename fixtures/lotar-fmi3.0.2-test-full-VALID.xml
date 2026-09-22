@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Hand-built fixture exercising as many LOTAR-relevant FMI3 archival +
+     provenance rules as possible in one file. Should pass BOTH
+     lotar-fmi3.0.2-archival.sch and lotar-fmi3.0.2-provenance.sch with
+     zero hard failures. Exercises: root provenance, single CoSimulation
+     interface, UnitDefinitions/DisplayUnit, TypeDefinitions (Float64Type,
+     Int32Type, EnumerationType+Item), LogCategories, DefaultExperiment,
+     Float64 array with Dimension+start list+Alias, Int32 array, Boolean,
+     String, Binary, Enumeration, a constant periodic Clock (decimal form),
+     ModelStructure with all five Unknown lists including ClockedState
+     (since a Clock is present) and EventIndicator, and unique Annotations. -->
+<fmiModelDescription fmiVersion="3.0.2"
+                      modelName="LOTAR.Test.FullValid"
+                      instantiationToken="{9a1b2c3d-4e5f-6789-abcd-ef0123456789}"
+                      description="Synthetic fixture exercising the LOTAR FMI3 archival profile"
+                      author="LOTAR Test Authoring"
+                      version="1.0.0"
+                      copyright="(c) 2026 LOTAR Test Authoring"
+                      license="BSD-2-Clause"
+                      generationTool="lotar-fmi3.0.2-test-fixture-authoring"
+                      generationDateAndTime="2026-07-20T00:00:00Z"
+                      variableNamingConvention="flat">
+
+  <CoSimulation modelIdentifier="lotarTestFullValid"
+                canHandleVariableCommunicationStepSize="true"/>
+
+  <UnitDefinitions>
+    <Unit name="rad">
+      <BaseUnit rad="1"/>
+      <DisplayUnit name="deg" factor="57.29577951308232"/>
+    </Unit>
+  </UnitDefinitions>
+
+  <TypeDefinitions>
+    <Float64Type name="Position" description="A generic scalar position type" quantity="Length" unit="rad"/>
+    <Int32Type name="Counter" description="A generic counter type" min="0" max="1000000"/>
+    <EnumerationType name="Mode" description="Operating mode enumeration" quantity="Mode" min="0" max="2">
+      <Item name="Idle" value="0" description="Not running"/>
+      <Item name="Running" value="1" description="Actively running"/>
+      <Item name="Fault" value="2" description="Faulted state"/>
+    </EnumerationType>
+  </TypeDefinitions>
+
+  <LogCategories>
+    <Category name="logAll" description="Log everything"/>
+    <Category name="logEvents" description="Log only discrete events"/>
+  </LogCategories>
+
+  <DefaultExperiment startTime="0" stopTime="10" tolerance="0.0001" stepSize="0.01"/>
+
+  <ModelVariables>
+    <Float64 name="position" valueReference="1" causality="output" description="Output position"
+             declaredType="Position" min="-10" max="10" nominal="1" start="0 0 0">
+      <Dimension start="3"/>
+      <Alias name="pos" description="short alias"/>
+    </Float64>
+    <Float64 name="gain" valueReference="2" causality="parameter" description="Controller gain"
+             min="0" max="100" nominal="1" start="1"/>
+    <Int32 name="counter" valueReference="3" causality="output" description="Loop counter"
+           declaredType="Counter" min="0" max="1000" start="0"/>
+    <Boolean name="enabled" valueReference="4" causality="parameter" description="Enable flag" start="true"/>
+    <String name="label" valueReference="5" causality="parameter" description="A text label">
+      <Start value="lotar-test"/>
+    </String>
+    <Binary name="payload" valueReference="6" causality="local" description="Raw payload"
+            mimeType="application/octet-stream">
+      <Annotations>
+        <Annotation type="fixture.variable.note">Per-variable annotation on payload.</Annotation>
+      </Annotations>
+    </Binary>
+    <Enumeration name="mode" valueReference="7" causality="output" description="Current mode"
+                 declaredType="Mode" start="0"/>
+    <Clock name="tick" valueReference="8" causality="input" description="Constant periodic clock"
+           intervalVariability="constant" intervalDecimal="0.01"/>
+    <Float64 name="tickState" valueReference="9" causality="local" description="State updated on tick"
+              clocks="8" start="0"/>
+  </ModelVariables>
+
+  <ModelStructure>
+    <Output valueReference="1" dependencies="2" dependenciesKind="tunable"/>
+    <Output valueReference="3" dependencies="8" dependenciesKind="discrete"/>
+    <Output valueReference="7" dependencies="8" dependenciesKind="discrete"/>
+    <ContinuousStateDerivative valueReference="1" dependencies="1 2" dependenciesKind="dependent dependent"/>
+    <ClockedState valueReference="9" dependencies="8" dependenciesKind="discrete"/>
+    <InitialUnknown valueReference="1" dependencies="2" dependenciesKind="tunable"/>
+    <EventIndicator valueReference="1" dependencies="1" dependenciesKind="dependent"/>
+  </ModelStructure>
+
+  <Annotations>
+    <Annotation type="fixture.root.note">Root-level fixture annotation.</Annotation>
+    <Annotation type="fixture.root.other">A second, differently-typed root annotation.</Annotation>
+  </Annotations>
+
+</fmiModelDescription>
