@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  LOTAR 2026 worked example (D-25, 2026-10-28): minimal P510 requirements-model manifest for the
+  InfiniRange Gate 2 range requirements, as the p510 branch of the 500-series archive
+  SSPExamples/EVRangeExampleV3_AIP/. Three requirements (Requirements_Gate2_Range.md) are verified by
+  the P520 scenario VV-1-RangeGain of the ElectricRange_V2 model in the p520 branch of the SAME archive:
+  the cross-branch links below carry an archive-root-relative Link with a #fragment that names the
+  scenario (resolved by lotar-tools against the archive root) and a Target_Id that identifies it
+  everywhere. This is the first instance of a requirement -> behavioral-model link inside one archive,
+  which the WG decision made legitimate. Content is illustrative; P510 itself is not in this project's
+  scope and its own archival Schematron layer does not exist yet.
+-->
+<p510:P510_Manifest xmlns:p510="http://www.lotar.org/schemas/mbse/p510#"
+                     xmlns:p500="http://www.lotar.org/schemas/mbse/p500#">
+  <p510:GeneralPLMInfo>
+    <p500:Unique_object_id>InfiniRange-Gate2-Requirements</p500:Unique_object_id>
+    <p500:Unique_baseline_id>InfiniRange-Gate2-Baseline</p500:Unique_baseline_id>
+    <p500:Version_identifier>1.2</p500:Version_identifier>
+    <p500:Model_Name>InfiniRange Gate 2 range and efficiency requirements</p500:Model_Name>
+    <p500:Created_on>2026-05-12T10:00:00Z</p500:Created_on>
+    <p500:Last_Modified_Date>2026-06-01T15:30:00Z</p500:Last_Modified_Date>
+    <p500:Created_by>L. Varga</p500:Created_by>
+    <p500:Maturity_State>Released for Gate 2</p500:Maturity_State>
+    <p500:Author_Organization>MBI LLC - Vehicle Programs, Requirements Engineering</p500:Author_Organization>
+    <p500:Approver>R. Halvorsen</p500:Approver>
+    <p500:Approval_State>Approved</p500:Approval_State>
+    <p500:Authorization>InfiniRange Powertrain Development Gate 2</p500:Authorization>
+    <p500:Usage>Range/efficiency substantiation of the torque-arbitration strategy and battery lineup</p500:Usage>
+    <p500:Copyright>https://example.invalid/mbi-llc/copyright</p500:Copyright>
+    <p500:License>https://example.invalid/mbi-llc/internal-use-license</p500:License>
+    <p500:Export_Controls>https://example.invalid/mbi-llc/export-controls</p500:Export_Controls>
+    <p500:Model_Purpose>State the range, efficiency and regenerative-braking requirements the Gate 2 decision must be substantiated against.</p500:Model_Purpose>
+    <p500:Model_Objective>Three verifiable requirements on combined-cycle range gain, battery-variant coverage and ambient robustness.</p500:Model_Objective>
+    <p500:System_Designation>EV Powertrain - Electric Range and Torque Arbitration</p500:System_Designation>
+    <p500:Model_Dependency>urn:lotar:MBI:2c9e5d10-6a7b-4c8d-9e0f-1a2b3c4d5e6f</p500:Model_Dependency>
+    <p500:Model_Hierarchy>urn:mbi:infinirange:requirements:powertrain</p500:Model_Hierarchy>
+    <p500:Abstraction_Level>System requirements (SyRS)</p500:Abstraction_Level>
+    <p500:Privacy_Rules>https://example.invalid/mbi-llc/privacy-rules</p500:Privacy_Rules>
+    <p500:Organization>MBI LLC</p500:Organization>
+    <p500:Export_control_marking>Company confidential, plus Need-to-know Tier 1 suppliers</p500:Export_control_marking>
+    <p500:Special_markings>None</p500:Special_markings>
+    <p500:Specification_Type_Objectives>Range gain from regenerative-brake blending</p500:Specification_Type_Objectives>
+    <p500:Specification_Type_Objectives>Battery-variant range coverage</p500:Specification_Type_Objectives>
+  </p510:GeneralPLMInfo>
+  <p510:RequirementsDevStructure>
+    <p510:DevTool_Name>Plain-text requirements (Markdown), managed in the program PLM</p510:DevTool_Name>
+    <p510:DevTool_Version>n/a</p510:DevTool_Version>
+    <p510:DevTool_License>n/a</p510:DevTool_License>
+    <p510:DevOS_Name>Windows</p510:DevOS_Name>
+    <p510:DevOS_Version>11</p510:DevOS_Version>
+    <p510:DevOS_License>Commercial (Microsoft)</p510:DevOS_License>
+    <p510:RequirementAuthoringTechnique>Semi-Formal</p510:RequirementAuthoringTechnique>
+    <p510:Format_name>Plain Text</p510:Format_name>
+    <p510:Format_version>1</p510:Format_version>
+    <p510:Specification_level>System Requirements Specification (SyRS)</p510:Specification_level>
+    <p510:Language>en</p510:Language>
+    <p510:uses>
+      <p500:Type>Local</p500:Type>
+      <p500:Link>p510/REQ-1/Requirements_Gate2_Range.md</p500:Link>
+      <p500:Target_Id>urn:lotar:MBI:7f3a2c1e-4b5d-4e6f-8a9b-0c1d2e3f4a5b:InfiniRange-Gate2-Requirements#Requirements_Gate2_Range</p500:Target_Id>
+      <p500:ContentType>Document</p500:ContentType>
+      <p500:Name>uses</p500:Name>
+      <p500:Description>The requirements text itself (REQ-RANGE-001..003)</p500:Description>
+      <p500:Timestamp_Archiving>2026-10-28T12:00:00Z</p500:Timestamp_Archiving>
+      <p500:Timestamp_PLM>2026-06-01T15:30:00Z</p500:Timestamp_PLM>
+    </p510:uses>
+  </p510:RequirementsDevStructure>
+  <p510:Requirements_Verification_Validation>
+    <p510:Scenario>
+      <p510:Id>REQ-VV-1</p510:Id>
+      <p510:Verification_Credibility_Level>CL3</p510:Verification_Credibility_Level>
+      <p510:Validation_Credibility_Level>CL3</p510:Validation_Credibility_Level>
+      <p510:Verified_by>
+        <p500:Type>Archive</p500:Type>
+        <p500:Link>p520/MODEL-1/P520_Manifest.xml#VV-9-DoesNotExist</p500:Link>
+        <p500:Target_Id>urn:lotar:MBI:7f3a2c1e-4b5d-4e6f-8a9b-0c1d2e3f4a5b:EVExample.FMUs.Intermediate.ElectricRange_V2#VV-1-RangeGain</p500:Target_Id>
+        <p500:Target_Version>0.81</p500:Target_Version>
+        <p500:ContentType>Behavioral Model</p500:ContentType>
+        <p500:Name>verified by</p500:Name>
+        <p500:Description>REQ-RANGE-001..003 are verified by the P520 scenario VV-1-RangeGain (another branch of this archive)</p500:Description>
+        <p500:Timestamp_Archiving>2026-10-28T12:00:00Z</p500:Timestamp_Archiving>
+        <p500:Timestamp_PLM>2026-08-04T09:00:00Z</p500:Timestamp_PLM>
+      </p510:Verified_by>
+      <p510:Model_Summary_Report>Requirements_Gate2_Range.md</p510:Model_Summary_Report>
+    </p510:Scenario>
+    <p510:Specification_Consistency>true</p510:Specification_Consistency>
+    <p510:Specification_Completeness>true</p510:Specification_Completeness>
+  </p510:Requirements_Verification_Validation>
+  <p510:Requirements_Traceability>
+    <p510:Satisfied_by>
+      <p500:Type>Archive</p500:Type>
+      <p500:Link>p520/MODEL-1/P520_Manifest.xml</p500:Link>
+      <p500:Target_Id>urn:lotar:MBI:7f3a2c1e-4b5d-4e6f-8a9b-0c1d2e3f4a5b:EVExample.FMUs.Intermediate.ElectricRange_V2</p500:Target_Id>
+      <p500:Target_Version>0.81</p500:Target_Version>
+      <p500:ContentType>Behavioral Model</p500:ContentType>
+      <p500:Name>satisfied by</p500:Name>
+      <p500:Timestamp_Archiving>2026-10-28T12:00:00Z</p500:Timestamp_Archiving>
+      <p500:Timestamp_PLM>2026-08-04T09:00:00Z</p500:Timestamp_PLM>
+    </p510:Satisfied_by>
+    <p510:Constrained_by>
+      <p500:Type>External</p500:Type>
+      <p500:Target_Id>urn:lotar:MBI:9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d:CAD-PART-4711</p500:Target_Id>
+      <p500:ContentType>Physical Model</p500:ContentType>
+      <p500:Name>constrained by</p500:Name>
+      <p500:Description>Battery pack envelope (CAD part 4711 in the 100-series archive of the same baseline) constrains the battery-variant lineup; identifier only, no locator across archives (S6)</p500:Description>
+      <p500:Timestamp_Archiving>2026-10-28T12:00:00Z</p500:Timestamp_Archiving>
+      <p500:Timestamp_PLM>2026-05-20T09:00:00Z</p500:Timestamp_PLM>
+    </p510:Constrained_by>
+  </p510:Requirements_Traceability>
+</p510:P510_Manifest>

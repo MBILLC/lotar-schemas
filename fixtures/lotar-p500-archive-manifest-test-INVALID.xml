@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Single-file INVALID fixture (2026-10-28, D-25) for lotar-p500-archive.sch. Each violation is isolated
+  to exercise one lettered assertion (XSD-valid on purpose, so only the Schematron layer fires):
+
+    - Entry 520 Manifest_Path "p510/.../P520_Manifest.xml"   -> P500-ARCH-101a (wrong branch for @part)
+    - Entry 550 Manifest_Path "p550/x/links.csv"              -> P500-ARCH-101b (not an .xml manifest)
+    - Entry 550 Manifest_Path has a "#frag"                   -> P500-ARCH-100e
+    - two entries share Unique_object_id "DUP"                -> P500-ARCH-102a
+    - Entry 510 Content_Type "Behavioral Model"               -> P500-ARCH-103a (warning)
+    - Decision_Record Path "p520/x/DecisionTask.dtmd"         -> P500-ARCH-104a, P500-ARCH-104c
+    - Fixity SHA-256 of 10 characters                         -> P500-ARCH-106a
+    - External_Reference pointing at this very archive        -> P500-ARCH-107c
+    - External_Reference Relationship_Type Other, no SubType  -> P500-ARCH-107d
+    - Last_Modified_Date before Created_on                    -> P500-ARCH-108b
+
+  Expected failed asserts, exactly: P500-ARCH-100e, 101a, 101b, 102a, 103a, 104a, 104c, 106a, 107c,
+  107d, 108b.
+-->
+<p500:Archive_Manifest xmlns:p500="http://www.lotar.org/schemas/mbse/p500#" schemaVersion="0.1">
+  <p500:Package_Identifier>urn:lotar:MBI:7f3a2c1e-4b5d-4e6f-8a9b-0c1d2e3f4a5b</p500:Package_Identifier>
+  <p500:Package_Type>AIP</p500:Package_Type>
+  <p500:Package_Version>1</p500:Package_Version>
+  <p500:Created_on>2026-10-28T12:00:00Z</p500:Created_on>
+  <p500:Last_Modified_Date>2026-10-01T12:00:00Z</p500:Last_Modified_Date>
+  <p500:Producer><p500:Name>MBI LLC</p500:Name></p500:Producer>
+  <p500:Creating_Software><p500:Name>lotar-tools</p500:Name><p500:Version>0.2.0</p500:Version></p500:Creating_Software>
+  <p500:Baseline>
+    <p500:Unique_baseline_id>InfiniRange-Gate2-Baseline</p500:Unique_baseline_id>
+  </p500:Baseline>
+  <p500:Contents>
+    <p500:Entry part="510">
+      <p500:Content_Type>Behavioral Model</p500:Content_Type>
+      <p500:Unique_object_id>DUP</p500:Unique_object_id>
+      <p500:Version_identifier>1</p500:Version_identifier>
+      <p500:Manifest_Path>p510/DUP/P510_Manifest.xml</p500:Manifest_Path>
+      <p500:Fixity algorithm="SHA-256">0000000000</p500:Fixity>
+      <p500:Size_bytes>1</p500:Size_bytes>
+    </p500:Entry>
+    <p500:Entry part="520">
+      <p500:Content_Type>Behavioral Model</p500:Content_Type>
+      <p500:Unique_object_id>DUP</p500:Unique_object_id>
+      <p500:Version_identifier>1</p500:Version_identifier>
+      <p500:Manifest_Path>p510/DUP/P520_Manifest.xml</p500:Manifest_Path>
+      <p500:Fixity algorithm="SHA-256">0000000000000000000000000000000000000000000000000000000000000002</p500:Fixity>
+      <p500:Size_bytes>1</p500:Size_bytes>
+    </p500:Entry>
+    <p500:Entry part="550">
+      <p500:Content_Type>Other</p500:Content_Type>
+      <p500:Unique_object_id>LINKS</p500:Unique_object_id>
+      <p500:Version_identifier>1</p500:Version_identifier>
+      <p500:Manifest_Path>p550/x/links.csv#frag</p500:Manifest_Path>
+      <p500:Fixity algorithm="SHA-256">0000000000000000000000000000000000000000000000000000000000000003</p500:Fixity>
+      <p500:Size_bytes>1</p500:Size_bytes>
+    </p500:Entry>
+  </p500:Contents>
+  <p500:Decision_Records>
+    <p500:Decision_Record>
+      <p500:GUID>97510c82-3603-40df-9022-5f75510983cb</p500:GUID>
+      <p500:Path>p520/x/DecisionTask.dtmd</p500:Path>
+      <p500:Fixity algorithm="SHA-256">0000000000000000000000000000000000000000000000000000000000000004</p500:Fixity>
+    </p500:Decision_Record>
+  </p500:Decision_Records>
+  <p500:External_References>
+    <p500:External_Reference>
+      <p500:Target_Archive_Id>urn:lotar:MBI:7f3a2c1e-4b5d-4e6f-8a9b-0c1d2e3f4a5b:DUP</p500:Target_Archive_Id>
+      <p500:Relationship_Type>Other</p500:Relationship_Type>
+      <p500:Target_Manifest_Fixity algorithm="SHA-256">0000000000000000000000000000000000000000000000000000000000000005</p500:Target_Manifest_Fixity>
+      <p500:Timestamp_Archiving>2026-10-28T12:00:00Z</p500:Timestamp_Archiving>
+    </p500:External_Reference>
+  </p500:External_References>
+</p500:Archive_Manifest>

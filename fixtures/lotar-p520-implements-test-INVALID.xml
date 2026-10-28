@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   Dedicated test fixture (2026-08-06, D-21/D-21b) for lotar-p520-uri.sch's P520-ARCH-002.
-  Link="subfolder/DecisionTask.dtmd" exercises P520-ARCH-002b (contains a path separator, not a
-  bare filename, so not "the same folder" per D-21b) while still ending in ".dtmd" (002d passes)
-  and still being present (002a passes) and containing no backslash (002c passes). Name="uses"
-  exercises P520-ARCH-002e (must read exactly "implements"). Expected exactly two failed asserts:
-  P520-ARCH-002b, P520-ARCH-002e.
+  Revised 2026-10-28 (D-25/S3). Link="DecisionTask.dtmd" is the pre-D-25 per-model sibling copy
+  (D-21b) and exercises P520-ARCH-002b (not under p520/_decisions/) while still ending in ".dtmd"
+  (002d passes), being present (002a passes) and containing no backslash (002c passes).
+  Name="uses" exercises P520-ARCH-002e (must read exactly "implements"). Target_Id is a bare GUID
+  without the urn:uuid: prefix -> P520-ARCH-002f; Type="Local" -> P520-ARCH-002g. Expected exactly
+  four failed asserts: P520-ARCH-002b, 002e, 002f, 002g.
 -->
 <TestFixture xmlns:p520="http://www.lotar.org/schemas/mbse/p520#"
              xmlns:p500="http://www.lotar.org/schemas/mbse/p500#">
   <p520:Implements>
-    <p500:Link>subfolder/DecisionTask.dtmd</p500:Link>
+    <p500:Type>Local</p500:Type>
+    <p500:Link>DecisionTask.dtmd</p500:Link>
+    <p500:Target_Id>97510c82-3603-40df-9022-5f75510983cb</p500:Target_Id>
     <p500:Name>uses</p500:Name>
   </p520:Implements>
 </TestFixture>

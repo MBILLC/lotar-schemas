@@ -716,13 +716,18 @@
 						decision); see the P520 risk-profile normative clause for when population is
 						actually mandatory.
 
-						Placement (D-21b, decided 2026-08-06): Link must be a bare filename (no
-						path separator) resolving to a .dtmd file located in the SAME folder as the
-						P520_Manifest.xml instance that contains this element. This is one per-model
-						folder holding three siblings: the P520_Manifest.xml itself, the governing
-						.dtmd record, and the SSP or FMU package this manifest describes (the
-						package's own internal layout is unaffected by this rule). See
-						P520_Risk_Profile_Normative_Clause.md Sec.5.7 for the concrete layout and
+						Placement (D-21b, 2026-08-06; REVISED by D-25, 2026-10-28, WG decisions S1-S3):
+						all 500-series artifacts of a baseline live in ONE archive with a top-level
+						manifest (P500_Archive_Manifest.xsd). This P520_Manifest.xml is the part
+						manifest of the model's branch, p520/&lt;object-id&gt;/, next to the SSP or FMU
+						package it describes (whose internal layout is unaffected). The governing
+						decision record has exactly ONE canonical copy at archive level,
+						p520/_decisions/&lt;guid&gt;.dtmd; Implements/Link locates it by that
+						archive-root-relative path, Implements/Target_Id identifies it as
+						"urn:uuid:&lt;GUID&gt;", Implements/Type is "Archive". The former per-model
+						sibling copy of the .dtmd is dropped; the package-internal copy (D-20) stays
+						and is verified byte-identical by lotar-tools' archive mode. See
+						P520_Risk_Profile_Normative_Clause.md Sec.5.6/5.7 for the layout and
 						lotar-p520-uri.sch's P520-ARCH-002 pattern for the enforced syntax rules.
 					</xs:documentation>
 				</xs:annotation>

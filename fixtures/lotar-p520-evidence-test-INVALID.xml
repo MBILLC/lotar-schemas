@@ -110,7 +110,7 @@
 <p520:Verification_Credibility_Level>CL3</p520:Verification_Credibility_Level>
 <p520:Validation_Credibility_Level>CL3</p520:Validation_Credibility_Level>
 <p520:Model_Summary_Report>results/GateReview2Summary.md</p520:Model_Summary_Report>
-<p520:Implements><p500:Link>DecisionTask.dtmd</p500:Link><p500:Name>implements</p500:Name><p500:Description>Governing Credible Decision Process record that commissioned this model report (D-21)</p500:Description><p500:Timestamp_Archiving>2026-08-04T09:00:00Z</p500:Timestamp_Archiving><p500:Timestamp_PLM>2026-08-04T09:00:00Z</p500:Timestamp_PLM></p520:Implements>
+<p520:Implements><p500:Type>Archive</p500:Type><p500:Link>p520/_decisions/97510c82-3603-40df-9022-5f75510983cb.dtmd</p500:Link><p500:Target_Id>urn:uuid:97510c82-3603-40df-9022-5f75510983cb</p500:Target_Id><p500:Name>implements</p500:Name><p500:Description>Governing Credible Decision Process record that commissioned this model report (D-21)</p500:Description><p500:Timestamp_Archiving>2026-08-04T09:00:00Z</p500:Timestamp_Archiving><p500:Timestamp_PLM>2026-08-04T09:00:00Z</p500:Timestamp_PLM></p520:Implements>
   </p520:Verification_Validation_Scenario>
 </p520:Verification_Validation>
 </p520:P520_Manifest>

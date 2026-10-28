@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<dtmd:DecisionTaskMetaData version="1.0.0" name="Fixture DTMD (D-21b sibling copy)" GUID="f1a2b3c4-3333-4abc-9def-000000000002"
-    xmlns:stc="http://ssp-standard.org/SSPTraceability1/SSPTraceabilityCommon"
-    xmlns:dtmd="http://ssp-standard.org/SSPTraceability1/DecisionTaskMetaData">
-  <dtmd:GeneralInformation/>
-</dtmd:DecisionTaskMetaData>

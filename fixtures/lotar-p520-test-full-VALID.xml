@@ -104,9 +104,9 @@
 <p520:Id>VV-1-RangeGain</p520:Id>
 <p520:Verification_Credibility_Level>CL3</p520:Verification_Credibility_Level>
 <p520:Validation_Credibility_Level>CL3</p520:Validation_Credibility_Level>
-<p520:Validated_by><p500:Link>results/ValidationSummary.md</p500:Link><p500:Name>validates</p500:Name><p500:Description>Local summary of the SIC/MIC Core credibility assessment status and target levels recorded in EVRangeExampleV3s Credibility-Assessment2024-10.srmd</p500:Description><p500:Timestamp_Archiving>2026-08-04T09:00:00Z</p500:Timestamp_Archiving><p500:Timestamp_PLM>2026-08-04T09:00:00Z</p500:Timestamp_PLM></p520:Validated_by>
+<p520:Validated_by><p500:Type>Local</p500:Type><p500:Link>p520/EVExample.FMUs.Intermediate.ElectricRange_V2/results/ValidationSummary.md</p500:Link><p500:Target_Id>urn:lotar:MBI:7f3a2c1e-4b5d-4e6f-8a9b-0c1d2e3f4a5b:EVExample.FMUs.Intermediate.ElectricRange_V2#ValidationSummary</p500:Target_Id><p500:Name>validates</p500:Name><p500:Description>Local summary of the SIC/MIC Core credibility assessment status and target levels recorded in EVRangeExampleV3s Credibility-Assessment2024-10.srmd</p500:Description><p500:Timestamp_Archiving>2026-08-04T09:00:00Z</p500:Timestamp_Archiving><p500:Timestamp_PLM>2026-08-04T09:00:00Z</p500:Timestamp_PLM></p520:Validated_by>
 <p520:Model_Summary_Report>results/GateReview2Summary.md</p520:Model_Summary_Report>
-<p520:Implements><p500:Link>DecisionTask.dtmd</p500:Link><p500:Name>implements</p500:Name><p500:Description>Governing Credible Decision Process record that commissioned this model report (D-21)</p500:Description><p500:Timestamp_Archiving>2026-08-04T09:00:00Z</p500:Timestamp_Archiving><p500:Timestamp_PLM>2026-08-04T09:00:00Z</p500:Timestamp_PLM></p520:Implements>
+<p520:Implements><p500:Type>Archive</p500:Type><p500:Link>p520/_decisions/97510c82-3603-40df-9022-5f75510983cb.dtmd</p500:Link><p500:Target_Id>urn:uuid:97510c82-3603-40df-9022-5f75510983cb</p500:Target_Id><p500:Name>implements</p500:Name><p500:Description>Governing Credible Decision Process record that commissioned this model report (D-21)</p500:Description><p500:Timestamp_Archiving>2026-08-04T09:00:00Z</p500:Timestamp_Archiving><p500:Timestamp_PLM>2026-08-04T09:00:00Z</p500:Timestamp_PLM></p520:Implements>
   <p520:TestCase>
   <p520:Context>
     <p520:Number>1</p520:Number>

@@ -40,21 +40,22 @@
   Compiles under queryBinding="xslt" (XPath 1.0/XSLT 1.0), consistent with every other LOTAR
   Schematron profile in this project.
 
-  Pattern 2 (P520-ARCH-002), added 2026-08-06 (D-21/D-21b): Verification_Validation_Scenario_Type's
-  new Implements element (p520:Implements, type p500:Traceability_Link_Type — see P520_SCHEMA.xsd's
-  own documentation on that element) links a scenario's Model Report to its governing CDP/DTMD
-  record. Per D-21b (LOTAR_Risk_Profile_Process_Plan_2026-07-24.md, P520_Risk_Profile_Normative_
-  Clause.md §5.7), the governing .dtmd file is placed as a direct SIBLING of P520_Manifest.xml
-  itself (same folder, no subdirectory) — deliberately stricter than P500-ARCH-001's general
-  "relative, no .. traversal" rule for Traceability_Link_Type's Link element, since "same folder"
-  additionally forbids ANY path separator, not just ".." segments. P500-ARCH-001 (lotar-p500-uri.sch)
-  still applies to Implements/Link too (it matches any p500:Link generically) — this pattern adds
-  the extra bare-filename and .dtmd-suffix constraints, plus the Name="implements" relation-label
-  mandate, on top of it. Existence-on-disk and same-directory colocation are, as with every other
-  file reference in this project, out of scope for Schematron — the companion script
-  lotar_uri_resolve_check.py's existing, generic "Link (p500)" entry (base_kind "", resolves against
-  the directory of the containing file) already does the right thing here with no changes, since
-  P520_Manifest.xml is that containing file by construction.
+  Pattern 2 (P520-ARCH-002), added 2026-08-06 (D-21/D-21b), REVISED 2026-10-28 (D-25, WG decision
+  S3 — see planning/WG_Decision_Request_Single_500_Series_Archive.md): Verification_Validation_
+  Scenario_Type's Implements element (p520:Implements, type p500:Traceability_Link_Type) links a
+  scenario's Model Report to its governing CDP/DTMD record. Since D-25 all 500-series artifacts of a
+  baseline live in ONE archive, and the governing decision record has exactly ONE canonical copy at
+  archive level, p520/_decisions/<guid>.dtmd (S3), referenced from every P520 manifest of the
+  baseline by an archive-root-relative locator. The D-21b per-model-folder sibling copy is dropped;
+  the package-INTERNAL copy an SSP/FMU carries under its own top-level extra/ (D-20, STMD-ARCH-04)
+  stays, and lotar-tools' archive mode verifies it is byte-identical to the canonical one (the
+  stale-copy gap noted in LOTAR_CDP_Top_Level_Packaging_Analysis.md is thereby closed).
+
+  Rules: Link present (002a), under p520/_decisions/ (002b — replaces the former "bare filename"
+  rule), no backslash (002c), ends in .dtmd (002d), Name = "implements" (002e), Target_Id =
+  urn:uuid:<GUID> (002f), Type = Archive or absent (002g). P500-ARCH-001/002 (lotar-p500-uri.sch)
+  still apply to Implements generically. Existence on disk, and that Target_Id's GUID equals the
+  GUID attribute of the .dtmd at Link, are checked by lotar-tools (archive mode), not here.
 -->
 <schema xmlns="http://purl.oclc.org/dsdl/schematron" xml:lang="en" queryBinding="xslt">
 
@@ -90,10 +91,10 @@
       <assert test="p500:Link" id="P520-ARCH-002a" role="error">
         [P520-ARCH-002a][M] Implements must carry a Link to the governing DTMD instance (D-21).
       </assert>
-      <assert test="not(p500:Link) or not(contains(p500:Link,'/'))" id="P520-ARCH-002b" role="error">
-        [P520-ARCH-002b][M] Implements/Link must be a bare filename with no path separator at all —
-        the governing .dtmd file is required to sit as a direct sibling of P520_Manifest.xml itself
-        (D-21b), not merely somewhere relative to it.
+      <assert test="not(p500:Link) or starts-with(p500:Link,'p520/_decisions/')" id="P520-ARCH-002b" role="error">
+        [P520-ARCH-002b][M] Implements/Link must locate the archive's canonical decision record,
+        "p520/_decisions/&lt;guid&gt;.dtmd" (archive-root-relative, D-25/S3) — not a per-model
+        sibling copy (the pre-D-25 D-21b layout) and not a copy inside the SSP/FMU package.
       </assert>
       <assert test="not(contains(p500:Link,'\'))" id="P520-ARCH-002c" role="error">
         [P520-ARCH-002c][M] Implements/Link must not contain a backslash.
@@ -106,6 +107,14 @@
       <assert test="p500:Name = 'implements'" id="P520-ARCH-002e" role="error">
         [P520-ARCH-002e][M] Implements/Name must read exactly "implements" (D-21's normative
         relation label).
+      </assert>
+      <assert test="starts-with(p500:Target_Id,'urn:uuid:')" id="P520-ARCH-002f" role="error">
+        [P520-ARCH-002f][M] Implements/Target_Id must identify the decision record by its GUID as
+        "urn:uuid:&lt;GUID&gt;" (D-25/S2) — the identifier that survives relocation.
+      </assert>
+      <assert test="not(p500:Type) or p500:Type = 'Archive'" id="P520-ARCH-002g" role="error">
+        [P520-ARCH-002g][M] Implements/Type must be "Archive" (or absent): the governing decision
+        record is always in the same 500-series archive as the model it governs (D-25/S3).
       </assert>
     </rule>
 

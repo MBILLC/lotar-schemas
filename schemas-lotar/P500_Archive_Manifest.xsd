@@ -1,0 +1,619 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+	vc:minVersion="1.1"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	xmlns="http://www.lotar.org/schemas/mbse/p500#"
+	xmlns:tns="http://www.lotar.org/schemas/mbse/p500#"
+	targetNamespace="http://www.lotar.org/schemas/mbse/p500#"
+	>
+
+	<xs:include schemaLocation="P500_Series_Common.xsd"/>
+
+	<xs:annotation>
+		<xs:documentation>
+			NAS9300 500-series ARCHIVE MANIFEST — the top-level manifest of a single 500-series
+			archive (one OAIS AIP holding all 5xx artifacts of one configured baseline), and the
+			record format of the metadata-only BASELINE LINK ARCHIVE that relates archives of
+			different series.
+
+			Status: DRAFT supplied by the NAS9300-520 drafting team as the first working instance
+			(D-25, 2026-10-28, executing WG decisions S1–S6 of
+			planning/WG_Decision_Request_Single_500_Series_Archive.md). Ownership (S4): this is a
+			series-wide artifact and belongs to NAS9300-500 or the 011–014 packaging parts, NOT to
+			Part 520 — P520 conforms to it and provides the worked instance
+			(SSPExamples/EVRangeExampleV3_AIP/lotar-500-manifest.xml). It sits in the p500#
+			namespace (same chameleon pattern as P500_Series_Common.xsd, which it includes) for
+			that reason.
+
+			Archive layout this manifest describes (S1):
+
+			  &lt;archive-root&gt;/
+			    lotar-500-manifest.xml            this document
+			    lotar-500-manifest.xml.xades      detached XAdES-LTA signature (mandatory CL3/CL4)
+			    p510/&lt;object-id&gt;/P510_Manifest.xml  + requirements files
+			    p520/&lt;object-id&gt;/P520_Manifest.xml  + the SSP/FMU package (internally unchanged)
+			    p520/_decisions/&lt;guid&gt;.dtmd       canonical decision records of the baseline (S3)
+			    p550/&lt;object-id&gt;/P550_Manifest.xml  link sets between the above
+			    p5xx/...                          other 500-series parts, same pattern
+
+			What the manifest carries, traced to the NAS9300-021 packaging requirements
+			(gap-analyses/Requirements.md):
+			  Package_Identifier (P1), Package_Type (P2), Package_Version (P11), Created_on /
+			  Last_Modified_Date (P7/P8), Producer (P9, D4 enterprise id), Creating_Software (P5),
+			  Submission_Agreement (P6), Retention (PD11), Baseline (NAS9300-500 §8.8.2, D4),
+			  Contents/Entry (P3 structure, P4 content type, P13 file manifest, PD1 fixity, PD4 size,
+			  D8 part reference), Decision_Records (PD17 approval records, S3), Schemas (GR1/GR3/
+			  P14), Rights (P12, package-level only — S5), External_References (S6 layer 2: PD8/
+			  D5/D6 relationships to OTHER archives, by identifier only), Signature (PD17/PD18).
+
+			What it deliberately does NOT carry (S4b): semantic relationships between archived
+			objects (requirement verifies scenario, model implements decision, ...). Those live in
+			the P550 branch and in the part manifests' Traceability_Link elements; the top-level
+			manifest records CONTAINMENT only, so there is one source of truth per relationship.
+
+			Precedence (S5): a part manifest's GeneralPLMInfo is authoritative for its own object.
+			The top-level manifest carries package-level information only (baseline, producer,
+			package rights) and, per Entry, a COPY of the object's identifier and version for
+			discovery — a contradiction between an Entry and its part manifest is a validation
+			error (lotar-tools archive mode), never resolved in favour of the top-level document.
+
+			METS mapping (S4): a normative mapping of every element below to METS 1.12 (mets/@OBJID,
+			metsHdr, fileSec, structMap, mptr for External_References) is given in
+			planning/P500_Archive_Manifest_METS_Mapping.md, so an archive can be exposed to
+			preservation systems that speak METS without changing the 5xx readers' own format.
+
+			Companion Schematron: lotar-p500-archive.sch (P500-ARCH-100..109). Filesystem checks
+			(existence, fixity, cross-branch link resolution, decision-record copy consistency,
+			Entry-vs-part-manifest consistency): lotar-tools `lotar check &lt;archive-root&gt;`.
+		</xs:documentation>
+	</xs:annotation>
+
+	<!-- ===================================================================================
+	     Root elements
+	     =================================================================================== -->
+	<xs:element name="Archive_Manifest" type="Archive_Manifest_Type">
+		<xs:annotation>
+			<xs:documentation> Root element of lotar-500-manifest.xml — the top-level manifest of a
+				500-series archive. </xs:documentation>
+		</xs:annotation>
+	</xs:element>
+
+	<xs:element name="Baseline_Link_Set" type="Baseline_Link_Set_Type">
+		<xs:annotation>
+			<xs:documentation> Root element of the link records of a metadata-only baseline link
+				archive (S6 layer 3; the package type NAS9300-021 GR4 requires). The link archive is
+				itself a 500-series archive with its own Archive_Manifest, whose single content
+				Entry (@part="500", Content_Type="Other") points at this document. </xs:documentation>
+		</xs:annotation>
+	</xs:element>
+
+	<!-- ===================================================================================
+	     Archive manifest
+	     =================================================================================== -->
+	<xs:complexType name="Archive_Manifest_Type">
+		<xs:sequence>
+			<xs:element name="Package_Identifier" type="LOTAR_Identifier_Type">
+				<xs:annotation>
+					<xs:documentation> Persistent identifier of this archive (P1): a LOTAR URN
+						"urn:lotar:&lt;producer-code&gt;:&lt;uuid&gt;" (producer code = CAGE or
+						enterprise identifier, D4/P9; UUID = package identifier). Immutable, never
+						reused; a new AIP version (P11) keeps the identifier and increments
+						Package_Version. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Package_Type" type="Package_Type_Type">
+				<xs:annotation>
+					<xs:documentation> OAIS package type (P2): SIP, AIP or DIP. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Package_Kind" type="Package_Kind_Type" minOccurs="0" default="content">
+				<xs:annotation>
+					<xs:documentation> "content" (default) for an archive holding 5xx content
+						branches; "link" for a metadata-only baseline link archive (GR4, S6 layer 3)
+						whose only content is a Baseline_Link_Set. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Package_Version" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> AIP version (P11), e.g. "1"; incremented on migration or
+						preservation action. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Created_on" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation> Package creation date (P7). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Last_Modified_Date" type="xs:dateTime" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Last modification date (P8). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Producer" type="Agent_Type">
+				<xs:annotation>
+					<xs:documentation> Producer organisation (P9), with its enterprise identifier
+						(CAGE code, D4). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Creating_Software" type="Agent_Type">
+				<xs:annotation>
+					<xs:documentation> Software that created the package (P5): name and version. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Submission_Agreement" type="xs:anyURI" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Reference to the Submission Agreement between Producer and
+						Archive (P6; required for a SIP). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Retention" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Planned retention period (PD11), e.g. "P50Y" or a policy
+						reference. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Baseline" type="Baseline_Type">
+				<xs:annotation>
+					<xs:documentation> The configured baseline this archive captures (NAS9300-500
+						§8.8.2, NAS9300-002) and the product it belongs to (D4). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Contents" type="Contents_Type">
+				<xs:annotation>
+					<xs:documentation> Containment: one Entry per 500-series part artifact (P3, P13).
+						Containment only — no semantic relationships here (S4b). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Decision_Records" type="Decision_Records_Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> The canonical credible-decision-process records (.dtmd) of
+						this baseline, one copy each under p520/_decisions/ (S3). Every other copy of
+						the same record inside the archive (e.g. the one an SSP/FMU package carries
+						internally for its own self-containment) must be byte-identical to the
+						canonical one — checked by lotar-tools archive mode. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Schemas" type="Schemas_Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Schemas and controlled vocabularies the archive's content
+						conforms to (GR1, GR3, P14), by identifier and — when co-archived — by
+						archive-relative path. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Rights" type="Rights_Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Package-level rights information (P12). Each part manifest's
+						own GeneralPLMInfo rights fields remain authoritative for that object (S5);
+						this block governs the package as a whole (e.g. the archive's export-control
+						marking is the most restrictive marking of any part). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="External_References" type="External_References_Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Declared outbound dependencies on OTHER archives (S6 layer 2;
+						PD8, D5, D6): identifier of the foreign archive, its version, the relationship
+						type, and the fixity of that archive's own top-level manifest at the time of
+						linking, so the right archive version can be confirmed after migration. Never
+						a locator: nothing that is a path or URL crosses an archive boundary. A dangling
+						external reference is a warning at archive level and an error at repository
+						level. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Signature" type="Signature_Reference_Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Detached XAdES-LTA signature over this manifest (PD17/PD18).
+						Because every Entry carries fixity, one signature over the manifest makes the
+						whole archive tamper-evident. Mandatory at CL3/CL4, recommended at CL2
+						(LOTAR_XAdES_LTA_Plan.md). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="schemaVersion" type="xs:string" use="required" fixed="0.1">
+			<xs:annotation>
+				<xs:documentation> Version of this manifest schema the document conforms to. </xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:simpleType name="LOTAR_Identifier_Type">
+		<xs:annotation>
+			<xs:documentation> LOTAR persistent identifier (S6 layer 1):
+				urn:lotar:&lt;producer-code&gt;:&lt;archive-uuid&gt;[:&lt;object-id&gt;][#&lt;anchor&gt;].
+				Lexical check only; semantics (immutability, version awareness) are in the clause text. </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:pattern value="urn:lotar:[A-Za-z0-9._\-]+:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(:[^#\s/\\]+)?(#[^\s/\\]+)?"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="Package_Type_Type">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="SIP"/>
+			<xs:enumeration value="AIP"/>
+			<xs:enumeration value="DIP"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="Package_Kind_Type">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="content"/>
+			<xs:enumeration value="link"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="Agent_Type">
+		<xs:sequence>
+			<xs:element name="Name" type="xs:string"/>
+			<xs:element name="Identifier" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Enterprise identifier (CAGE code, DUNS, ...) for an
+						organisation; omitted for software. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Version" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Software version; omitted for an organisation. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Baseline_Type">
+		<xs:sequence>
+			<xs:element name="Unique_baseline_id" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Same value as the part manifests' GeneralPLMInfo/
+						Unique_baseline_id; a part manifest that names a different baseline is a
+						validation error. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Baseline_Name" type="xs:string" minOccurs="0"/>
+			<xs:element name="Baseline_Status" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Status per the relevant domain part's vocabulary (D9), e.g.
+						"frozen", "released". </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Product" type="Product_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation> Product/part identification the baseline belongs to (D4). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Product_Type">
+		<xs:sequence>
+			<xs:element name="Part_Number" type="xs:string"/>
+			<xs:element name="Part_Version" type="xs:string" minOccurs="0"/>
+			<xs:element name="Part_Description" type="xs:string" minOccurs="0"/>
+			<xs:element name="Program_Identifier" type="xs:string" minOccurs="0"/>
+			<xs:element name="System_Identifier" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Contents_Type">
+		<xs:sequence>
+			<xs:element name="Entry" type="Content_Entry_Type" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Content_Entry_Type">
+		<xs:annotation>
+			<xs:documentation> One archived 500-series object: which part governs it, what kind of
+				content it is, its identifier and version (copied from its part manifest for
+				discovery — the part manifest stays authoritative, S5), where its part manifest sits
+				in the archive, and the fixity of that part manifest. </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Content_Type" type="ContentTypeType">
+				<xs:annotation>
+					<xs:documentation> P4 content type, from P500_Series_Common.xsd's vocabulary
+						(Requirement Model for 510, Behavioral Model for 520, Other for a 550 link set). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Unique_object_id" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> The object's identifier; must equal the part manifest's
+						GeneralPLMInfo/Unique_object_id. Unique within the archive. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Version_identifier" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> Must equal the part manifest's GeneralPLMInfo/Version_identifier. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Name" type="xs:string" minOccurs="0"/>
+			<xs:element name="Manifest_Path" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation> Archive-root-relative locator of the part manifest
+						(P510_Manifest.xml, P520_Manifest.xml, ...). Its first path segment is the
+						part's branch folder "p&lt;part&gt;/" (S1). Everything under the manifest's
+						own folder is that object's branch. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Fixity" type="Fixity_Type">
+				<xs:annotation>
+					<xs:documentation> Digest of the part manifest file (PD1). Fixity of the files the
+						part manifest itself references is the part manifest's responsibility
+						(P520_Related_Type/@checksum, SRMD, fmi-ls-ref, ...). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Size_bytes" type="xs:nonNegativeInteger">
+				<xs:annotation>
+					<xs:documentation> Size of the part manifest file (PD4). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Format" type="xs:string" minOccurs="0" default="application/xml">
+				<xs:annotation>
+					<xs:documentation> MIME type of the part manifest (PD2). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="part" type="Part_Number_Type" use="required">
+			<xs:annotation>
+				<xs:documentation> NAS9300 500-series part number governing this entry (D8):
+					510, 515, 520, 550, ..., or 500 for a series-level artifact such as a
+					Baseline_Link_Set. </xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:simpleType name="Part_Number_Type">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="5[0-9]{2}"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="Fixity_Type">
+		<xs:simpleContent>
+			<xs:extension base="Hex_Digest_Type">
+				<xs:attribute name="algorithm" type="Digest_Algorithm_Type" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:simpleType name="Hex_Digest_Type">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9a-fA-F]+"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="Digest_Algorithm_Type">
+		<xs:annotation>
+			<xs:documentation> Same algorithm names as fmi-ls-ref's TRelated/@checksumType and the
+				SRMD @checksumType, so one resolver verifies all of them. </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="SHA-256"/>
+			<xs:enumeration value="SHA-384"/>
+			<xs:enumeration value="SHA-512"/>
+			<xs:enumeration value="SHA3-256"/>
+			<xs:enumeration value="SHA3-384"/>
+			<xs:enumeration value="SHA3-512"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="Decision_Records_Type">
+		<xs:sequence>
+			<xs:element name="Decision_Record" type="Decision_Record_Type" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Decision_Record_Type">
+		<xs:sequence>
+			<xs:element name="GUID" type="xs:string">
+				<xs:annotation>
+					<xs:documentation> The .dtmd's own GUID attribute; P520 manifests reference the
+						record with Implements/Target_Id = "urn:uuid:&lt;GUID&gt;". </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Path" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation> Archive-root-relative locator of the canonical copy:
+						p520/_decisions/&lt;guid&gt;.dtmd (S3). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Fixity" type="Fixity_Type"/>
+			<xs:element name="Size_bytes" type="xs:nonNegativeInteger" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Schemas_Type">
+		<xs:sequence>
+			<xs:element name="Schema" type="Schema_Reference_Type" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Schema_Reference_Type">
+		<xs:sequence>
+			<xs:element name="Identifier" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation> Namespace URI or vocabulary identifier (e.g.
+						http://www.lotar.org/schemas/mbse/p520#, org.lotar-international.lotar-core.common). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Version" type="xs:string" minOccurs="0"/>
+			<xs:element name="Path" type="xs:anyURI" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Archive-root-relative locator when the schema/vocabulary is
+						co-archived (GR1/GR3 "included or referenced"). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="kind" use="optional" default="schema">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="schema"/>
+					<xs:enumeration value="schematron"/>
+					<xs:enumeration value="vocabulary"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="Rights_Type">
+		<xs:sequence>
+			<xs:element name="Copyright" type="xs:anyURI" minOccurs="0"/>
+			<xs:element name="License" type="xs:anyURI" minOccurs="0"/>
+			<xs:element name="Export_Controls" type="xs:anyURI" minOccurs="0"/>
+			<xs:element name="Export_control_marking" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Package-level marking — the most restrictive marking of any
+						contained part. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Privacy_Rules" type="xs:anyURI" minOccurs="0"/>
+			<xs:element name="Special_markings" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="External_References_Type">
+		<xs:sequence>
+			<xs:element name="External_Reference" type="External_Reference_Type" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="External_Reference_Type">
+		<xs:sequence>
+			<xs:element name="Target_Archive_Id" type="LOTAR_Identifier_Type">
+				<xs:annotation>
+					<xs:documentation> Package_Identifier of the foreign archive
+						(urn:lotar:&lt;producer&gt;:&lt;uuid&gt;), optionally extended with
+						":&lt;object-id&gt;" when one object in it is meant. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Target_Version" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Package_Version of the foreign archive the link was made
+						against; absent = "latest in lineage". </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Target_Series" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> NAS9300 series/part of the foreign archive (100, 200, 400,
+						500...), informative. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Relationship_Type" type="Relationship_Type_Type"/>
+			<xs:element name="Relationship_SubType" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Local/extended vocabulary value when Relationship_Type is
+						"Other" (GR3 extensibility, PD8 sub-type). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Target_Manifest_Fixity" type="Fixity_Type">
+				<xs:annotation>
+					<xs:documentation> Digest of the foreign archive's own top-level manifest at the
+						time of linking — the key to confirming, decades later, that the archive
+						retrieved is the one meant. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Description" type="xs:string" minOccurs="0"/>
+			<xs:element name="Timestamp_PLM" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="Timestamp_Archiving" type="xs:dateTime"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="Relationship_Type_Type">
+		<xs:annotation>
+			<xs:documentation> Controlled relationship vocabulary (PD8/D5), in the style of PREMIS
+				relationships and DCMI relation terms; extensible through "Other" +
+				Relationship_SubType (GR3). </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="isDerivedFrom"/>
+			<xs:enumeration value="verifies"/>
+			<xs:enumeration value="validates"/>
+			<xs:enumeration value="implements"/>
+			<xs:enumeration value="isPartOfBaseline"/>
+			<xs:enumeration value="supersedes"/>
+			<xs:enumeration value="isSupersededBy"/>
+			<xs:enumeration value="references"/>
+			<xs:enumeration value="Other"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="Signature_Reference_Type">
+		<xs:sequence>
+			<xs:element name="Path" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation> Archive-root-relative locator of the detached signature file,
+						normally lotar-500-manifest.xml.xades. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Format" type="xs:string" default="XAdES-LTA" minOccurs="0"/>
+			<xs:element name="Signer_Role" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- ===================================================================================
+	     Baseline link set (metadata-only link archive, S6 layer 3)
+	     =================================================================================== -->
+	<xs:complexType name="Baseline_Link_Set_Type">
+		<xs:annotation>
+			<xs:documentation> Signed, metadata-only set of relationships between archives of any
+				series, produced by configuration management at baseline release. It is the one
+				place bidirectional discovery is possible (an older CAD archive cannot know about a
+				later simulation archive) and it is superseded, never edited, when a new baseline is
+				cut. Both ends of every record are identifiers; nothing here is a locator. </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Unique_baseline_id" type="xs:string"/>
+			<xs:element name="Produced_by" type="Agent_Type">
+				<xs:annotation>
+					<xs:documentation> The configuration-management role/organisation that cut the
+						baseline. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Supersedes" type="LOTAR_Identifier_Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Package_Identifier of the previous link archive of the same
+						product lineage, if any. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Link_Record" type="Link_Record_Type" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="schemaVersion" type="xs:string" use="required" fixed="0.1"/>
+	</xs:complexType>
+
+	<xs:complexType name="Link_Record_Type">
+		<xs:sequence>
+			<xs:element name="Source_Id" type="LOTAR_Identifier_Type">
+				<xs:annotation>
+					<xs:documentation> urn:lotar:&lt;producer&gt;:&lt;archive-uuid&gt;[:&lt;object-id&gt;
+						[#&lt;anchor&gt;]] — the archive and, optionally, the object the relation starts
+						from. An anchor is resolved by that object's part manifest, never by this
+						record. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Source_Version" type="xs:string" minOccurs="0"/>
+			<xs:element name="Target_Id" type="LOTAR_Identifier_Type"/>
+			<xs:element name="Target_Version" type="xs:string" minOccurs="0"/>
+			<xs:element name="Relationship_Type" type="Relationship_Type_Type"/>
+			<xs:element name="Relationship_SubType" type="xs:string" minOccurs="0"/>
+			<xs:element name="Direction" minOccurs="0" default="directed">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="directed"/>
+						<xs:enumeration value="bidirectional"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Source_Manifest_Fixity" type="Fixity_Type" minOccurs="0"/>
+			<xs:element name="Target_Manifest_Fixity" type="Fixity_Type">
+				<xs:annotation>
+					<xs:documentation> Digest of the target archive's top-level manifest at the time
+						the record was made. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Timestamp_PLM" type="xs:dateTime"/>
+			<xs:element name="Timestamp_Archiving" type="xs:dateTime"/>
+			<xs:element name="Description" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:ID" use="optional"/>
+	</xs:complexType>
+
+</xs:schema>

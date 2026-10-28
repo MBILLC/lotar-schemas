@@ -22,6 +22,20 @@
 			defines its own distinct link/traceability model (Model_Links, Traceability_Link,
 			Metadata_Link, Link_Type). Traceability_Link_Type and LinkTypeInterpretation are
 			shared by P510 and P520 (and, until its integration into P520 on 2026-09-05, D-23, P515).
+
+			Link model revision (D-25, 2026-10-28 — WG decision S2 of
+			planning/WG_Decision_Request_Single_500_Series_Archive.md): all 500-series artifacts of
+			one baseline live in ONE archive (an OAIS AIP) with a top-level manifest
+			(P500_Archive_Manifest.xsd, same namespace). Traceability_Link_Type therefore now
+			separates the LOCATOR of a link target from its IDENTIFIER:
+			  - Link       = archive-root-relative locator (optional "#fragment"), present only
+			                 for targets inside the same archive;
+			  - Target_Id  = persistent identifier of the target object (always present) — the
+			                 only thing that may cross an archive boundary;
+			  - Type       = Local | Archive | External (Global is deprecated, read as Archive).
+			Rules: lotar-p500-uri.sch P500-ARCH-001 (locator syntax) and P500-ARCH-002
+			(identifier/locator consistency); the filesystem resolver (lotar-tools) resolves Link
+			against the archive root found via the top-level manifest.
 		</xs:documentation>
 	</xs:annotation>
 
@@ -171,15 +185,52 @@
 	</xs:complexType>
 
 	<xs:complexType name="Traceability_Link_Type">
+		<xs:annotation>
+			<xs:documentation>
+				A traceability link from the containing part manifest to another archived object
+				(D-25, 2026-10-28). Locator and identifier are separate fields: Link locates the target
+				inside the same 500-series archive, Target_Id identifies it everywhere. Links point at part
+				manifests (P510_Manifest.xml, P520_Manifest.xml, P550_Manifest.xml), their fragments, and
+				the archive's canonical decision records — never into an SSP/FMU package: anything inside
+				a package that must be reachable from outside gets an anchor in its part manifest.
+			</xs:documentation>
+		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="Type" type="LinkTypeInterpretation" minOccurs="0">
 				<xs:annotation>
-					<xs:documentation> Interpretation of the link type (local or global). </xs:documentation>
+					<xs:documentation> Scope of the link: Local (same part manifest / same branch),
+						Archive (another branch of the same 500-series archive; default when absent),
+						External (another archive — identifier only, no Link). Global is deprecated and
+						read as Archive. </xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="Link" type="xs:anyURI">
+			<xs:element name="Link" type="xs:anyURI" minOccurs="0">
 				<xs:annotation>
-					<xs:documentation> URI of the linked resource. Target path in the referencing part. </xs:documentation>
+					<xs:documentation> Locator of the linked resource, relative to the ROOT of the
+						500-series archive (the directory holding lotar-500-manifest.xml): no leading
+						"/", no "..", no scheme or drive letter, no backslash; an optional "#fragment"
+						names an element inside the target XML document (xml:id/@id, or a P510/P520
+						Id element value). Required when Type is Local or Archive (or absent); MUST be
+						absent when Type is External. Valid only inside the archive — it never
+						survives relocation on its own, which is what Target_Id is for.
+						(Before D-25 this field was also used as an identifier; the pre-D-25 fixtures'
+						"urn:" values now belong in Target_Id.) </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Target_Id" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation> Persistent identifier of the target object — the target's
+						Unique_object_id (a URN; for a credible-process record its GUID as
+						"urn:uuid:&lt;GUID&gt;"), optionally followed by "#" and an element identifier
+						(anchor). Always required. This is what survives relocation and what references
+						between archives of different series use (urn:lotar:&lt;producer&gt;:&lt;archive-
+						uuid&gt;:&lt;object-id&gt;#&lt;anchor&gt;, see P500_Archive_Manifest.xsd). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Target_Version" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> The target's Version_identifier or baseline identifier when a
+						specific version is meant; optional. </xs:documentation>
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="ContentType" type="ContentTypeType" minOccurs="0">
@@ -212,10 +263,15 @@
 
 	<xs:simpleType name="LinkTypeInterpretation">
 		<xs:annotation>
-			<xs:documentation> The link is internal to the document or external. </xs:documentation>
+			<xs:documentation> Scope of a traceability link (D-25): Local = same part manifest or
+				same branch of the archive; Archive = another branch of the same 500-series archive;
+				External = an object in another archive, referenced by identifier only (no Link).
+				Global is retained for pre-D-25 instances and is deprecated: read it as Archive. </xs:documentation>
 		</xs:annotation>
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="Local"/>
+			<xs:enumeration value="Archive"/>
+			<xs:enumeration value="External"/>
 			<xs:enumeration value="Global"/>
 		</xs:restriction>
 	</xs:simpleType>

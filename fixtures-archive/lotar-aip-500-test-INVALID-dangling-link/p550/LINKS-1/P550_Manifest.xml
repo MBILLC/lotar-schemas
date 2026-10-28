@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  LOTAR 2026 worked example (D-25, 2026-10-28): minimal P550 link-set manifest for the InfiniRange
+  Gate 2 baseline, as the p550 branch of the 500-series archive SSPExamples/EVRangeExampleV3_AIP/.
+  Per WG decision S4b the TOP-LEVEL manifest records containment only; the semantic relationships of
+  the baseline (requirement verified by scenario, model implements decision) are recorded HERE, as
+  frozen records of the links that existed in the live PLM environment (linkType names the live
+  technology; it is not how the archive resolves anything). P550's own link elements are plain
+  strings in the current schema draft, so each record carries the two ends as LOTAR identifiers
+  (metadataToModelElement = source, modelElementToElementLink = target) plus, as metadata, the
+  archive-root-relative locator of the target for readers inside this archive. P550 is not in this
+  project's scope; its schema is used as-is.
+-->
+<p550:P550_Manifest xmlns:p550="http://www.lotar.org/schemas/mbse/p550#"
+                     xmlns:p500="http://www.lotar.org/schemas/mbse/p500#">
+  <p550:GeneralPLMInfo>
+    <p500:Unique_object_id>InfiniRange-Gate2-Links</p500:Unique_object_id>
+    <p500:Unique_baseline_id>InfiniRange-Gate2-Baseline</p500:Unique_baseline_id>
+    <p500:Version_identifier>1</p500:Version_identifier>
+    <p500:Model_Name>InfiniRange Gate 2 traceability link set</p500:Model_Name>
+    <p500:Created_on>2026-10-28T12:00:00Z</p500:Created_on>
+    <p500:Created_by>Configuration Management</p500:Created_by>
+    <p500:Maturity_State>Frozen with the baseline</p500:Maturity_State>
+    <p500:Author_Organization>MBI LLC - Configuration Management</p500:Author_Organization>
+    <p500:Approver>R. Halvorsen</p500:Approver>
+    <p500:Approval_State>Approved</p500:Approval_State>
+    <p500:Authorization>InfiniRange Powertrain Development Gate 2</p500:Authorization>
+    <p500:Usage>Traceability between the Gate 2 requirements, the range model and the governing decision</p500:Usage>
+    <p500:Copyright>https://example.invalid/mbi-llc/copyright</p500:Copyright>
+    <p500:License>https://example.invalid/mbi-llc/internal-use-license</p500:License>
+    <p500:Export_Controls>https://example.invalid/mbi-llc/export-controls</p500:Export_Controls>
+    <p500:Model_Purpose>Preserve the live PLM traceability links of the baseline as frozen records.</p500:Model_Purpose>
+    <p500:Model_Objective>Three link records: requirements verified by scenario, model satisfies requirements, model implements decision.</p500:Model_Objective>
+    <p500:System_Designation>EV Powertrain - Electric Range and Torque Arbitration</p500:System_Designation>
+    <p500:Model_Dependency>urn:lotar:MBI:7f3a2c1e-4b5d-4e6f-8a9b-0c1d2e3f4a5b:InfiniRange-Gate2-Requirements</p500:Model_Dependency>
+    <p500:Model_Dependency>urn:lotar:MBI:7f3a2c1e-4b5d-4e6f-8a9b-0c1d2e3f4a5b:EVExample.FMUs.Intermediate.ElectricRange_V2</p500:Model_Dependency>
+    <p500:Model_Hierarchy>urn:mbi:infinirange:links</p500:Model_Hierarchy>
+    <p500:Abstraction_Level>Baseline traceability</p500:Abstraction_Level>
+    <p500:Privacy_Rules>https://example.invalid/mbi-llc/privacy-rules</p500:Privacy_Rules>
+    <p500:Organization>MBI LLC</p500:Organization>
+    <p500:Export_control_marking>Company confidential, plus Need-to-know Tier 1 suppliers</p500:Export_control_marking>
+    <p500:Special_markings>None</p500:Special_markings>
+    <p500:Specification_Type_Objectives>Traceability</p500:Specification_Type_Objectives>
+  </p550:GeneralPLMInfo>
+  <p550:Model_Links>
+    <p550:traceabilityLink>
+      <p550:metadataToModelElement>urn:lotar:MBI:7f3a2c1e-4b5d-4e6f-8a9b-0c1d2e3f4a5b:InfiniRange-Gate2-Requirements#REQ-VV-1</p550:metadataToModelElement>
+      <p550:modelElementToElementLink>urn:lotar:MBI:7f3a2c1e-4b5d-4e6f-8a9b-0c1d2e3f4a5b:EVExample.FMUs.Intermediate.ElectricRange_V2#VV-1-RangeGain</p550:modelElementToElementLink>
+      <p550:linkType>OSLC</p550:linkType>
+      <p550:metadataLinks><p550:property>relationship</p550:property><p550:value>verifies</p550:value></p550:metadataLinks>
+      <p550:metadataLinks><p550:property>target-locator</p550:property><p550:value>p520/EVExample.FMUs.Intermediate.ElectricRange_V2/P520_Manifest.xml#VV-1-RangeGain</p550:value></p550:metadataLinks>
+    </p550:traceabilityLink>
+    <p550:traceabilityLink>
+      <p550:metadataToModelElement>urn:lotar:MBI:7f3a2c1e-4b5d-4e6f-8a9b-0c1d2e3f4a5b:EVExample.FMUs.Intermediate.ElectricRange_V2</p550:metadataToModelElement>
+      <p550:modelElementToElementLink>urn:lotar:MBI:7f3a2c1e-4b5d-4e6f-8a9b-0c1d2e3f4a5b:InfiniRange-Gate2-Requirements</p550:modelElementToElementLink>
+      <p550:linkType>OSLC</p550:linkType>
+      <p550:metadataLinks><p550:property>relationship</p550:property><p550:value>satisfies</p550:value></p550:metadataLinks>
+      <p550:metadataLinks><p550:property>target-locator</p550:property><p550:value>p510/InfiniRange-Gate2-Requirements/P510_Manifest.xml</p550:value></p550:metadataLinks>
+    </p550:traceabilityLink>
+    <p550:traceabilityLink>
+      <p550:metadataToModelElement>urn:lotar:MBI:7f3a2c1e-4b5d-4e6f-8a9b-0c1d2e3f4a5b:EVExample.FMUs.Intermediate.ElectricRange_V2#VV-1-RangeGain</p550:metadataToModelElement>
+      <p550:modelElementToElementLink>urn:uuid:97510c82-3603-40df-9022-5f75510983cb</p550:modelElementToElementLink>
+      <p550:linkType>hyperLink</p550:linkType>
+      <p550:metadataLinks><p550:property>relationship</p550:property><p550:value>implements</p550:value></p550:metadataLinks>
+      <p550:metadataLinks><p550:property>target-locator</p550:property><p550:value>p520/_decisions/97510c82-3603-40df-9022-5f75510983cb.dtmd</p550:value></p550:metadataLinks>
+    </p550:traceabilityLink>
+  </p550:Model_Links>
+</p550:P550_Manifest>

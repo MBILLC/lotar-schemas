@@ -8,9 +8,21 @@
   contexts — real embedded coverage of Copyright/License/Export_Controls/Model_Dependency/
   Model_Hierarchy/Privacy_Rules exists in fixtures/lotar-p520-test-full-VALID.xml (2026-09-05,
   D-23; formerly the P515 fixture, whose all-urn: values this pattern must continue to accept).
+
+  Revised 2026-10-28 (D-25): Link is an archive-root-relative locator ("p520/<object-id>/..." reaches
+  another branch of the same archive) and every traceability link carries a Target_Id identifier
+  (P500-ARCH-002). The wrapper element TraceLink stands for any Traceability_Link_Type instance.
 -->
 <TestFixture xmlns:p500="http://www.lotar.org/schemas/mbse/p500#">
-  <p500:Link>reports/summary.pdf</p500:Link>
+  <TraceLink>
+    <p500:Type>Archive</p500:Type>
+    <p500:Link>p520/EVExample.FMUs.Intermediate.ElectricRange_V2/P520_Manifest.xml#VV-1-RangeGain</p500:Link>
+    <p500:Target_Id>urn:lotar:MBI:7f3a2c1e-4b5d-4e6f-8a9b-0c1d2e3f4a5b:EVExample.FMUs.Intermediate.ElectricRange_V2#VV-1-RangeGain</p500:Target_Id>
+  </TraceLink>
+  <TraceLink>
+    <p500:Type>External</p500:Type>
+    <p500:Target_Id>urn:lotar:MBI:2c9e5d10-6a7b-4c8d-9e0f-1a2b3c4d5e6f:CAD-PART-4711</p500:Target_Id>
+  </TraceLink>
   <p500:Copyright>urn:copyright:example</p500:Copyright>
   <p500:License>https://creativecommons.org/licenses/by/4.0/</p500:License>
   <p500:Export_Controls>urn:export:none</p500:Export_Controls>

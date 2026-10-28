@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Single-file test fixture (2026-10-28, D-25/S6 layer 3) for P500_Archive_Manifest.xsd's second root,
+  p500:Baseline_Link_Set — the record set of a metadata-only baseline link archive relating archives
+  of different NAS9300 series by identifier only. Here: the 500-series simulation archive of the
+  InfiniRange Gate 2 baseline is part of the 200-series PLM baseline archive, and one deep target
+  inside it (a P520 scenario anchor) verifies a 100-series CAD part. Digests are placeholders.
+-->
+<p500:Baseline_Link_Set xmlns:p500="http://www.lotar.org/schemas/mbse/p500#" schemaVersion="0.1">
+  <p500:Unique_baseline_id>InfiniRange-Gate2-Baseline</p500:Unique_baseline_id>
+  <p500:Produced_by>
+    <p500:Name>MBI LLC - Configuration Management</p500:Name>
+    <p500:Identifier>CAGE:0XMB1</p500:Identifier>
+  </p500:Produced_by>
+  <p500:Link_Record id="L1">
+    <p500:Source_Id>urn:lotar:MBI:7f3a2c1e-4b5d-4e6f-8a9b-0c1d2e3f4a5b</p500:Source_Id>
+    <p500:Source_Version>1</p500:Source_Version>
+    <p500:Target_Id>urn:lotar:MBI:2c9e5d10-6a7b-4c8d-9e0f-1a2b3c4d5e6f</p500:Target_Id>
+    <p500:Target_Version>3</p500:Target_Version>
+    <p500:Relationship_Type>isPartOfBaseline</p500:Relationship_Type>
+    <p500:Direction>directed</p500:Direction>
+    <p500:Target_Manifest_Fixity algorithm="SHA-256">0000000000000000000000000000000000000000000000000000000000000005</p500:Target_Manifest_Fixity>
+    <p500:Timestamp_PLM>2026-10-20T08:00:00Z</p500:Timestamp_PLM>
+    <p500:Timestamp_Archiving>2026-10-28T12:00:00Z</p500:Timestamp_Archiving>
+    <p500:Description>500-series simulation archive of the Gate 2 baseline is configured by the 200-series PLM baseline archive</p500:Description>
+  </p500:Link_Record>
+  <p500:Link_Record id="L2">
+    <p500:Source_Id>urn:lotar:MBI:7f3a2c1e-4b5d-4e6f-8a9b-0c1d2e3f4a5b:EVExample.FMUs.Intermediate.ElectricRange_V2#VV-1-RangeGain</p500:Source_Id>
+    <p500:Target_Id>urn:lotar:MBI:9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d:CAD-PART-4711</p500:Target_Id>
+    <p500:Relationship_Type>verifies</p500:Relationship_Type>
+    <p500:Target_Manifest_Fixity algorithm="SHA-256">0000000000000000000000000000000000000000000000000000000000000006</p500:Target_Manifest_Fixity>
+    <p500:Timestamp_PLM>2026-10-20T08:00:00Z</p500:Timestamp_PLM>
+    <p500:Timestamp_Archiving>2026-10-28T12:00:00Z</p500:Timestamp_Archiving>
+  </p500:Link_Record>
+</p500:Baseline_Link_Set>

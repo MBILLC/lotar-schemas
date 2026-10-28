@@ -5,14 +5,16 @@
   CDP/DTMD record). Synthetic Schematron-only fixture using a lightweight wrapper limited to the
   element this rule targets, same convention as lotar-p520-uri-test-VALID.xml.
 
-  Link="DecisionTask.dtmd" is a bare filename (no path separator) ending in .dtmd, exactly
-  D-21b's "direct sibling of P520_Manifest.xml" requirement. Name="implements" matches D-21's
-  normative relation label exactly.
+  Revised 2026-10-28 (D-25/S3): Link locates the archive's canonical decision record under
+  p520/_decisions/ by GUID, Target_Id identifies it as urn:uuid:<GUID>, Type is Archive, and
+  Name="implements" matches D-21's normative relation label exactly.
 -->
 <TestFixture xmlns:p520="http://www.lotar.org/schemas/mbse/p520#"
              xmlns:p500="http://www.lotar.org/schemas/mbse/p500#">
   <p520:Implements>
-    <p500:Link>DecisionTask.dtmd</p500:Link>
+    <p500:Type>Archive</p500:Type>
+    <p500:Link>p520/_decisions/97510c82-3603-40df-9022-5f75510983cb.dtmd</p500:Link>
+    <p500:Target_Id>urn:uuid:97510c82-3603-40df-9022-5f75510983cb</p500:Target_Id>
     <p500:Name>implements</p500:Name>
   </p520:Implements>
 </TestFixture>

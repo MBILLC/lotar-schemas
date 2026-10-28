@@ -4,6 +4,11 @@
   isolated to exercise exactly one lettered assertion:
 
     - Link = "/abs/reports/summary.pdf"           -> P500-ARCH-001a (absolute path)
+    - second link: Type External WITH a Link      -> P500-ARCH-002c (D-25: no locator across archives)
+    - third link: Target_Id = "p510/x/P510_Manifest.xml" (a path, not an identifier) and Type
+      Local without a Link                        -> P500-ARCH-002b, P500-ARCH-002d
+    - fourth link: Type Global (deprecated)       -> P500-ARCH-002e (warning)
+    - Link into a package "p520/x/Model.ssp/SystemStructure.ssd" -> P500-ARCH-001e
     - Copyright = "C:\rights\copyright.txt"        -> P500-ARCH-010a (backslash)
                                                        [ALSO trips 010b, since "C:\" is also a
                                                        drive-letter-absolute prefix — documents
@@ -16,7 +21,24 @@
       applies uniformly across all six elements via the three violations above).
 -->
 <TestFixture xmlns:p500="http://www.lotar.org/schemas/mbse/p500#">
-  <p500:Link>/abs/reports/summary.pdf</p500:Link>
+  <TraceLink>
+    <p500:Link>/abs/reports/summary.pdf</p500:Link>
+    <p500:Target_Id>urn:lotar:MBI:7f3a2c1e-4b5d-4e6f-8a9b-0c1d2e3f4a5b:report</p500:Target_Id>
+  </TraceLink>
+  <TraceLink>
+    <p500:Type>External</p500:Type>
+    <p500:Link>p510/REQ/P510_Manifest.xml</p500:Link>
+    <p500:Target_Id>urn:lotar:MBI:2c9e5d10-6a7b-4c8d-9e0f-1a2b3c4d5e6f:REQ</p500:Target_Id>
+  </TraceLink>
+  <TraceLink>
+    <p500:Type>Local</p500:Type>
+    <p500:Target_Id>p510/x/P510_Manifest.xml</p500:Target_Id>
+  </TraceLink>
+  <TraceLink>
+    <p500:Type>Global</p500:Type>
+    <p500:Link>p520/x/Model.ssp/SystemStructure.ssd</p500:Link>
+    <p500:Target_Id>urn:lotar:MBI:7f3a2c1e-4b5d-4e6f-8a9b-0c1d2e3f4a5b:x</p500:Target_Id>
+  </TraceLink>
   <p500:Copyright>C:\rights\copyright.txt</p500:Copyright>
   <p500:License>file:///C:/licenses/mine.txt</p500:License>
   <p500:Export_Controls>C:/export/none.txt</p500:Export_Controls>
